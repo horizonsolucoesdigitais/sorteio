@@ -3,120 +3,226 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Roleta de Prêmios</title>
-<meta name="description" content="Sorteador em roleta, white label, com prêmios, participantes e design personalizáveis.">
+<title>Sorteio</title>
+<meta name="description" content="Sorteador white label em roleta ou caça-níquel, com prêmios, participantes, design e formatos de vídeo personalizáveis.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg1:#2a0a5e; --bg2:#7b1fa2; --accent:#ffd23f; --accent-ink:#1b1030; --text:#ffffff;
   --glass:rgba(255,255,255,.08); --glass-border:rgba(255,255,255,.16); --muted:rgba(255,255,255,.7);
-  --c1:#ff4d6d; --c2:#06d6a0; --c3:#118ab2;
+  --c1:#ff4d6d; --c2:#06d6a0;
   --ui-bg:#17141f; --ui-bg2:#211d2c; --ui-line:#332d42; --ui-text:#f1eef7; --ui-muted:#a39cb5; --ui-accent:#8b5cf6;
-  --radius:20px;
   --font-display:'Baloo 2', 'Poppins', system-ui, sans-serif;
   --font:'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font-family:var(--font); color:var(--text); overflow-x:hidden;
-  background:var(--bg1);
-  -webkit-font-smoothing:antialiased;
-}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{font-family:var(--font);color:var(--text);background:var(--bg1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.fmt-fixed{background:#060409;overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
-/* ---------- background blobs ---------- */
-.bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;background:radial-gradient(1200px 800px at 15% 10%, color-mix(in srgb, var(--bg2) 85%, transparent), transparent 70%), linear-gradient(140deg, var(--bg1), var(--bg2))}
-.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.38;animation:float 18s ease-in-out infinite}
-.b1{width:42vmax;height:42vmax;background:var(--c1);top:-12vmax;left:-10vmax}
-.b2{width:36vmax;height:36vmax;background:var(--c2);bottom:-14vmax;right:-8vmax;animation-delay:-6s}
-.b3{width:26vmax;height:26vmax;background:var(--accent);top:30%;left:55%;opacity:.22;animation-delay:-11s}
-@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(4vmax,3vmax) scale(1.08)}66%{transform:translate(-3vmax,2vmax) scale(.95)}}
+/* ================= frame & formats ================= */
+.viewport{position:relative}
+.fmt-fixed .viewport{position:fixed;inset:0;overflow:hidden}
+.frame{position:relative;font-size:16px;color:var(--text);isolation:isolate}
+.fmt-free .frame{min-height:100vh;min-height:100dvh}
+.fmt-fixed .frame{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(var(--s,1));overflow:hidden}
+.fmt-story .frame{width:1080px;height:1920px;font-size:30px}
+.fmt-wide .frame{width:1920px;height:1080px;font-size:24px}
+body.idle.fmt-fixed{cursor:none}
+
+.bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(120% 70% at 15% 8%, color-mix(in srgb, var(--bg2) 85%, transparent), transparent 70%), linear-gradient(140deg, var(--bg1), var(--bg2))}
+.fmt-free .bg{position:fixed}
+.blob{position:absolute;border-radius:50%;filter:blur(3.5em);opacity:.38;animation:float 18s ease-in-out infinite}
+.b1{width:60%;aspect-ratio:1;background:var(--c1);top:-18%;left:-15%}
+.b2{width:55%;aspect-ratio:1;background:var(--c2);bottom:-20%;right:-12%;animation-delay:-6s}
+.b3{width:38%;aspect-ratio:1;background:var(--accent);top:32%;left:56%;opacity:.2;animation-delay:-11s}
+.fmt-free .b1{width:42vmax}.fmt-free .b2{width:36vmax}.fmt-free .b3{width:26vmax}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6%,5%) scale(1.08)}66%{transform:translate(-5%,3%) scale(.95)}}
 .sparkles{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.55),transparent),radial-gradient(1.5px 1.5px at 70% 20%,rgba(255,255,255,.45),transparent),radial-gradient(2px 2px at 85% 70%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.45),transparent),radial-gradient(1.5px 1.5px at 55% 50%,rgba(255,255,255,.35),transparent);animation:twinkle 4s ease-in-out infinite alternate}
 @keyframes twinkle{from{opacity:.35}to{opacity:1}}
 
-/* ---------- header ---------- */
-.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;gap:16px;padding:18px clamp(16px,3vw,36px) 6px}
-.brand{display:flex;align-items:center;gap:16px;flex:1;min-width:0}
-.brand img{height:clamp(48px,9vh,92px);max-width:min(240px,30vw);object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
-.brand h1{margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,4.2vw,3.2rem);line-height:1;letter-spacing:.3px;text-shadow:0 4px 24px rgba(0,0,0,.25)}
-.brand p{margin:6px 0 0;color:var(--muted);font-size:clamp(.85rem,1.4vw,1.05rem)}
-.brand .tt{min-width:0}
-.actions{display:flex;gap:8px;align-items:center}
-.icon-btn{width:44px;height:44px;border-radius:14px;border:1px solid var(--glass-border);background:var(--glass);backdrop-filter:blur(10px);display:grid;place-items:center;transition:.2s}
-.icon-btn:hover{transform:translateY(-2px);background:color-mix(in srgb, var(--glass) 100%, rgba(255,255,255,.08))}
-.icon-btn svg{width:20px;height:20px}
-.icon-btn.off{opacity:.55}
-.btn-cfg{height:44px;padding:0 16px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;display:flex;gap:8px;align-items:center;box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent);transition:.2s}
-.btn-cfg:hover{transform:translateY(-2px)}
-.btn-cfg svg{width:18px;height:18px}
+.safe{position:relative;display:flex;flex-direction:column;gap:1em;height:100%}
+.fmt-free .safe{min-height:100vh;min-height:100dvh;padding:18px clamp(16px,3vw,36px) 16px;gap:12px}
+.fmt-story .safe{padding:260px 70px 300px;gap:.75em}
+.fmt-wide .safe{padding:54px 96px;gap:.7em}
 
-/* ---------- stage ---------- */
-.stage{flex:1;display:grid;grid-template-columns:1fr minmax(290px,360px);gap:clamp(16px,2.5vw,32px);padding:8px clamp(16px,3vw,36px) 24px;align-items:center}
-.wheel-area{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0}
-.now{min-height:32px;display:flex;align-items:center;gap:10px;padding:6px 16px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-weight:600;font-size:.95rem;max-width:100%}
-.now .dot{width:12px;height:12px;border-radius:50%;background:var(--dc,var(--accent));box-shadow:0 0 12px var(--dc,var(--accent));flex:none}
+/* safe-area guides (only shown while framing, never needed in the final video) */
+.guides{position:absolute;inset:0;pointer-events:none;z-index:40;display:none}
+.show-guides.fmt-fixed .guides{display:block}
+.g-safe{position:absolute;outline:3px dashed rgba(255,255,255,.9);box-shadow:0 0 0 4000px rgba(255,40,90,.22)}
+.fmt-story .g-safe{top:260px;left:70px;right:70px;bottom:300px}
+.fmt-wide .g-safe{top:54px;left:96px;right:96px;bottom:54px}
+.g-label{position:absolute;left:0;right:0;text-align:center;font:700 22px var(--font);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+.fmt-story .g-top{top:110px}.fmt-story .g-bot{bottom:130px}
+.fmt-wide .g-top{top:12px}.fmt-wide .g-bot{bottom:12px}
+
+/* ================= header ================= */
+.top{display:flex;align-items:center;gap:1em}
+.fmt-free .top{padding-right:var(--tbw,0px);min-height:56px}
+.brand{display:flex;align-items:center;gap:1em;min-width:0;flex:1}
+.brand img{height:5em;max-width:15em;object-fit:contain;filter:drop-shadow(0 .35em 1em rgba(0,0,0,.25))}
+.brand .tt{min-width:0}
+.brand h1{margin:0;font-family:var(--font-display);font-weight:800;line-height:1;font-size:2.6em;letter-spacing:.01em;text-shadow:0 .15em 1em rgba(0,0,0,.25)}
+.brand p{margin:.35em 0 0;color:var(--muted);font-size:1em}
+.fmt-free .brand img{height:clamp(48px,9vh,92px);max-width:min(240px,30vw)}
+.fmt-free .brand h1{font-size:clamp(1.6rem,4.2vw,3.2rem)}
+.fmt-free .brand p{font-size:clamp(.85rem,1.4vw,1.05rem)}
+.fmt-story .top,.fmt-story .brand{flex-direction:column;justify-content:center;text-align:center}
+.fmt-story .brand{gap:.4em}
+.fmt-story .brand img{height:3.3em;max-width:62%}
+.fmt-story .brand h1{font-size:2.2em}
+.fmt-story .brand p{font-size:.92em;margin-top:.25em}
+.fmt-wide .brand img{height:3.5em}
+.fmt-wide .brand h1{font-size:2.3em}
+
+/* ================= stage ================= */
+.stage{flex:1;min-height:0;display:grid;gap:1.2em}
+.fmt-free .stage{grid-template-columns:minmax(0,1fr) minmax(290px,360px);align-items:center;gap:clamp(16px,2.5vw,32px)}
+.fmt-wide .stage{grid-template-columns:minmax(0,1fr) 19em;grid-template-rows:minmax(0,1fr)}
+.fmt-story .stage{display:flex;flex-direction:column;gap:.7em}
+.draw{display:flex;flex-direction:column;align-items:center;gap:.8em;min-width:0;min-height:0}
+.fmt-fixed .draw{height:100%}
+.fmt-story .draw{flex:1}
+.now{min-height:2em;display:flex;align-items:center;gap:.6em;padding:.4em 1em;border-radius:99em;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-weight:600;font-size:.95em;max-width:100%}
+.now .dot{width:.75em;height:.75em;border-radius:50%;background:var(--dc,var(--accent));box-shadow:0 0 .75em var(--dc,var(--accent));flex:none}
 .now span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wheel-wrap{position:relative;width:min(100%, calc(100vh - 300px));min-width:260px;aspect-ratio:1}
+.draw-box{position:relative;width:100%;display:grid;place-items:center}
+.fmt-free .draw-box{height:clamp(320px,calc(100vh - 300px),1100px)}
+.fmt-fixed .draw-box{flex:1;min-height:0}
+.wheel-wrap{position:relative}
 .wheel-wrap canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:manipulation}
-.empty{position:absolute;inset:18%;display:none;place-items:center;text-align:center;border-radius:50%;border:2px dashed var(--glass-border);padding:12%;color:var(--muted)}
+.slots-wrap{position:absolute;inset:0;display:grid;place-items:center}
+.empty{position:absolute;inset:0;display:none;place-items:center;text-align:center;color:var(--muted);z-index:2}
 .empty.show{display:grid}
-.empty button{margin-top:12px}
-.controls{display:flex;flex-direction:column;align-items:center;gap:8px}
-.spin-btn{position:relative;border:0;border-radius:999px;padding:16px 56px;font-family:var(--font-display);font-weight:800;font-size:clamp(1.3rem,2.6vw,1.9rem);letter-spacing:2px;color:var(--accent-ink);background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));box-shadow:0 10px 0 color-mix(in srgb, var(--accent) 55%, #000), 0 18px 40px color-mix(in srgb, var(--accent) 45%, transparent);transition:transform .12s, box-shadow .12s, filter .2s;animation:pulse 2.2s ease-in-out infinite}
+.empty > div{padding:1.5em 2em;border-radius:1.2em;border:2px dashed var(--glass-border);background:rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+.empty button{margin-top:.75em}
+.controls{display:flex;flex-direction:column;align-items:center;gap:.5em}
+.fmt-fixed:not(.show-spin) .controls{display:none}
+.spin-btn{position:relative;border:0;border-radius:99em;padding:.5em 1.75em;font-family:var(--font-display);font-weight:800;font-size:1.9em;letter-spacing:.06em;color:var(--accent-ink);background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));box-shadow:0 .3em 0 color-mix(in srgb, var(--accent) 55%, #000), 0 .55em 1.3em color-mix(in srgb, var(--accent) 45%, transparent);transition:transform .12s, box-shadow .12s, filter .2s;animation:pulse 2.2s ease-in-out infinite}
+.fmt-free .spin-btn{font-size:clamp(1.3rem,2.6vw,1.9rem)}
+.fmt-fixed .spin-btn{font-size:1.3em}
 .spin-btn:hover{filter:brightness(1.06)}
-.spin-btn:active{transform:translateY(6px);box-shadow:0 4px 0 color-mix(in srgb, var(--accent) 55%, #000), 0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent)}
+.spin-btn:active{transform:translateY(.2em);box-shadow:0 .1em 0 color-mix(in srgb, var(--accent) 55%, #000), 0 .3em .8em color-mix(in srgb, var(--accent) 35%, transparent)}
 .spin-btn:disabled{animation:none;filter:saturate(.5) brightness(.85);cursor:not-allowed}
 @keyframes pulse{0%,100%{scale:1}50%{scale:1.05}}
-.hint{font-size:.8rem;color:var(--muted)}
+.hint{font-size:.8em;color:var(--muted)}
 .hint kbd{font-family:inherit;padding:1px 7px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass)}
+.fmt-fixed .hint{display:none}
 
-/* ---------- results panel ---------- */
-.panel{align-self:stretch;max-height:calc(100vh - 140px);display:flex;flex-direction:column;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden}
-.panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px}
-.panel-head h2{margin:0;font-family:var(--font-display);font-size:1.5rem}
-.pill{padding:4px 12px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.85rem}
-.bar{height:6px;margin:0 20px 10px;border-radius:9px;background:var(--glass-border);overflow:hidden}
+/* ================= prize panel ================= */
+.panel{align-self:stretch;display:flex;flex-direction:column;border-radius:1.25em;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);box-shadow:0 1.25em 3.75em rgba(0,0,0,.18);overflow:hidden;min-height:0}
+.fmt-free .panel{max-height:calc(100vh - 130px)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:1.1em 1.25em .6em}
+.panel-head h2{margin:0;font-family:var(--font-display);font-size:1.5em}
+.pill{padding:.25em .75em;border-radius:99em;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.85em}
+.bar{height:.375em;margin:0 1.25em .6em;border-radius:9px;background:var(--glass-border);overflow:hidden;flex:none}
 .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:9px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.slots{list-style:none;margin:0;padding:4px 12px 12px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:8px}
-.slot{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.12);border:1px solid transparent;transition:.3s}
-.slot::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:4px;background:var(--c)}
-.slot-n{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:.85rem;background:var(--c);color:var(--ci)}
-.slot-body{min-width:0;flex:1}
-.slot-prize{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.slot-winner{font-weight:700;font-size:.98rem;line-height:1.25;overflow-wrap:anywhere}
-.slot.pending .slot-winner{font-weight:500;color:var(--muted);font-style:italic}
-.slot.next{border-color:var(--c);background:color-mix(in srgb, var(--c) 18%, transparent);box-shadow:0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent)}
-.slot.done{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
-.slot.fresh{animation:pop .6s cubic-bezier(.2,1.6,.4,1), glow 1.6s ease-out}
+.plist{list-style:none;margin:0;padding:.25em .75em .75em;overflow:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:.5em;scrollbar-width:thin}
+.pitem{position:relative;display:flex;align-items:center;gap:.75em;padding:.6em .75em;border-radius:.9em;background:rgba(0,0,0,.12);border:1px solid transparent;transition:background .3s, border-color .3s}
+.pitem::before{content:"";position:absolute;left:0;top:.6em;bottom:.6em;width:.25em;border-radius:.25em;background:var(--c)}
+.pn{flex:none;width:2.1em;height:2.1em;border-radius:.7em;display:grid;place-items:center;font-weight:800;font-size:.85em;background:var(--c);color:var(--ci)}
+.pbody{min-width:0;flex:1}
+.pprize{font-size:.78em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pwinner{font-weight:700;font-size:.98em;line-height:1.25;overflow-wrap:anywhere}
+.pitem.pending .pwinner{font-weight:500;color:var(--muted);font-style:italic}
+.pitem.next{border-color:var(--c);background:color-mix(in srgb, var(--c) 18%, transparent)}
+.pitem.done{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.pitem.fresh{animation:pop .6s cubic-bezier(.2,1.6,.4,1), glow 1.6s ease-out}
 @keyframes pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
-@keyframes glow{0%{box-shadow:0 0 0 0 var(--c)}100%{box-shadow:0 0 0 14px transparent}}
-.redo{flex:none;width:30px;height:30px;border-radius:9px;border:1px solid var(--glass-border);background:transparent;opacity:.6;display:grid;place-items:center;transition:.2s}
+@keyframes glow{0%{box-shadow:0 0 0 0 var(--c)}100%{box-shadow:0 0 0 .9em transparent}}
+.redo{flex:none;width:1.9em;height:1.9em;border-radius:.6em;border:1px solid var(--glass-border);background:transparent;opacity:.55;display:grid;place-items:center;transition:.2s}
 .redo:hover{opacity:1;background:var(--glass)}
-.redo svg{width:15px;height:15px}
+.redo svg{width:.95em;height:.95em}
+.fmt-fixed .redo{opacity:.25}
 .panel-foot{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--glass-border)}
-.ghost{flex:1 1 auto;min-width:0;height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--glass-border);background:var(--glass);font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;transition:.2s}
+.fmt-fixed .panel-foot{display:none}
+.ghost{flex:1 1 auto;min-width:0;height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--glass-border);background:var(--glass);font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .ghost:hover{background:color-mix(in srgb, var(--glass) 100%, rgba(255,255,255,.1))}
 .ghost svg{width:15px;height:15px;flex:none}
-.empty-list{padding:20px;text-align:center;color:var(--muted);font-size:.9rem}
+.empty-list{padding:1.25em;text-align:center;color:var(--muted);font-size:.9em}
+.fmt-story .panel{flex:none;max-height:45%}
+.fmt-story .panel-head{padding:.6em 1em .35em}
+.fmt-story .panel-head h2{font-size:1.1em}
+.fmt-story .bar{margin:0 1em .45em;height:.3em}
+.fmt-story .plist{display:grid;grid-template-columns:1fr 1fr;gap:.35em;font-size:.78em;padding:.2em .6em .6em}
+.fmt-story .pitem{padding:.45em .6em}
 
-/* ---------- drawer (neutral control UI) ---------- */
-.scrim{position:fixed;inset:0;background:rgba(5,3,12,.5);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.3s;z-index:40}
+.foot{text-align:center;font-size:.8em;color:var(--muted);font-weight:500;flex:none}
+.fmt-free .foot{font-size:.8rem}
+.no-foot .foot{display:none}
+
+/* ================= slot machine ================= */
+.machine{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--gap);padding:var(--pad);border-radius:calc(var(--pad)*1.4);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 30%, #1d1429), #110b1a);
+  border:3px solid var(--accent);
+  box-shadow:0 0 0 calc(var(--pad)*.35) color-mix(in srgb, var(--accent) 22%, transparent), 0 1.2em 3em rgba(0,0,0,.45), inset 0 0 2em rgba(0,0,0,.55)}
+.machine.spinning{animation:mglow .5s ease-in-out infinite alternate}
+.machine.celebrate{animation:mglow .18s ease-in-out infinite alternate}
+@keyframes mglow{to{box-shadow:0 0 0 calc(var(--pad)*.35) color-mix(in srgb, var(--accent) 45%, transparent), 0 0 3em color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 2em rgba(0,0,0,.55)}}
+.marquee{height:var(--top);width:100%;display:flex;justify-content:space-between;align-items:center;padding:0 calc(var(--top)*.3)}
+.marquee i{width:var(--bulb);height:var(--bulb);border-radius:50%;background:rgba(255,255,255,.28);animation:bulb 1.3s steps(1) infinite}
+.marquee i:nth-child(odd){animation-delay:-.65s}
+.machine.spinning .marquee i{animation-duration:.24s;animation-delay:0s}
+.machine.spinning .marquee i:nth-child(odd){animation-delay:-.12s}
+.machine.celebrate .marquee i{animation-duration:.16s}
+@keyframes bulb{0%{background:#fffbe6;box-shadow:0 0 calc(var(--bulb)*1.4) #fff3b8}50%{background:rgba(255,255,255,.25);box-shadow:none}}
+.reels{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap)}
+.reel{width:var(--rw);display:flex;flex-direction:column;border-radius:calc(var(--head)*.32);overflow:hidden;background:#0c0814;border:2px solid var(--c);box-shadow:0 .4em 1em rgba(0,0,0,.35)}
+.reel-head{height:var(--head);flex:none;display:flex;align-items:center;justify-content:center;gap:.4em;padding:0 .4em;background:var(--c);color:var(--ci);font-weight:800;font-size:calc(var(--head)*.44);white-space:nowrap;overflow:hidden}
+.reel-head b{opacity:.75;font-weight:800}
+.reel-win{position:relative;height:calc(var(--ch)*var(--v));overflow:hidden;background:linear-gradient(180deg,#e9e3f3,#ffffff 50%,#e9e3f3)}
+.reel-win::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(10,6,20,.6),rgba(10,6,20,0) 32%,rgba(10,6,20,0) 68%,rgba(10,6,20,.6))}
+.strip{position:absolute;left:0;right:0;top:0;will-change:transform}
+.cell{height:var(--ch);display:flex;align-items:center;justify-content:center;text-align:center;padding:0 .45em;font-size:var(--f);font-weight:700;color:#1d1430;line-height:1.12;border-bottom:1px solid rgba(29,20,48,.08);transition:transform .25s}
+.cell span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.cell.win{color:#000;font-weight:800;transform:scale(1.06)}
+.payline{position:absolute;left:0;right:0;top:calc(var(--ch)*var(--mid));height:var(--ch);border-top:3px solid var(--c);border-bottom:3px solid var(--c);background:color-mix(in srgb, var(--c) 16%, transparent);pointer-events:none;z-index:1}
+.payline::before,.payline::after{content:"";position:absolute;top:50%;width:0;height:0;border-top:calc(var(--ch)*.18) solid transparent;border-bottom:calc(var(--ch)*.18) solid transparent;transform:translateY(-50%)}
+.payline::before{left:0;border-left:calc(var(--ch)*.2) solid var(--c)}
+.payline::after{right:0;border-right:calc(var(--ch)*.2) solid var(--c)}
+.reel.hit{animation:reelhit .6s cubic-bezier(.2,1.6,.4,1)}
+.reel.hit .payline{animation:paypulse .45s ease-in-out infinite alternate}
+@keyframes paypulse{to{background:color-mix(in srgb, var(--c) 42%, transparent)}}
+@keyframes reelhit{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* ================= floating toolbar (outside the recorded frame) ================= */
+.toolbar{position:fixed;top:14px;right:14px;z-index:45;display:flex;align-items:center;gap:6px;padding:6px;border-radius:16px;background:rgba(18,14,26,.72);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);color:#fff;font-size:14px;transition:opacity .35s, transform .35s}
+.fmt-free .toolbar{top:18px;right:clamp(16px,3vw,36px)}
+body.idle.fmt-fixed .toolbar{opacity:0;transform:translateY(-8px);pointer-events:none}
+/* nothing but the show may appear inside the captured frame */
+body.recording .toolbar, body.recording .toasts{display:none}
+.tb{height:40px;min-width:40px;padding:0 10px;border-radius:11px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;color:#fff}
+.tb:hover{background:rgba(255,255,255,.1)}
+.tb svg{width:19px;height:19px;flex:none}
+.tb.off{opacity:.5}
+.tb.on{background:rgba(139,92,246,.35)}
+.tb.primary{background:var(--accent);color:var(--accent-ink)}
+.tb.rec.live{background:#e11d48;animation:recpulse 1s ease-in-out infinite}
+@keyframes recpulse{50%{background:#9f1239}}
+.tb.spin-mini{display:none;background:var(--accent);color:var(--accent-ink);font-weight:800}
+.fmt-fixed .tb.spin-mini{display:inline-flex}
+.seg{display:flex;padding:3px;border-radius:11px;background:rgba(255,255,255,.08)}
+.seg button{height:34px;padding:0 10px;border-radius:8px;border:0;background:transparent;color:rgba(255,255,255,.7);font-weight:700;font-size:13px}
+.seg button[aria-pressed="true"]{background:#fff;color:#17141f}
+.tb-sep{width:1px;height:24px;background:rgba(255,255,255,.15)}
+
+/* ================= drawer (neutral control UI) ================= */
+.scrim{position:fixed;inset:0;background:rgba(5,3,12,.5);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.3s;z-index:60}
 .scrim.show{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--ui-bg);color:var(--ui-text);z-index:41;transform:translateX(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.4)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:var(--ui-bg);color:var(--ui-text);z-index:61;transform:translateX(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.4);font-size:16px}
 .drawer.show{transform:none}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px}
 .drawer-head h2{margin:0;font-size:1.2rem}
 .drawer-head small{display:block;color:var(--ui-muted);font-size:.78rem;font-weight:400}
 .x-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--ui-line);background:var(--ui-bg2);display:grid;place-items:center}
 .tabs{display:flex;gap:4px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--ui-line)}
-.tabs button{flex:none;border:0;background:transparent;color:var(--ui-muted);padding:9px 12px;border-radius:10px;font-weight:600;font-size:.86rem;display:flex;gap:6px;align-items:center}
+.tabs button{flex:none;border:0;background:transparent;color:var(--ui-muted);padding:9px 11px;border-radius:10px;font-weight:600;font-size:.84rem}
 .tabs button[aria-selected="true"]{background:var(--ui-bg2);color:var(--ui-text);box-shadow:inset 0 -2px 0 var(--ui-accent)}
 .tab-body{flex:1;overflow:auto;padding:18px 20px 40px}
 .tab{display:none}
@@ -129,6 +235,8 @@ button{cursor:pointer}
 .drawer textarea{resize:vertical;min-height:120px;line-height:1.5;font-size:.9rem}
 #namesInput{min-height:300px;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:.85rem}
 .help{font-size:.76rem;color:var(--ui-muted);margin-top:6px;line-height:1.45}
+.tip{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:color-mix(in srgb, var(--ui-accent) 16%, var(--ui-bg2));border:1px solid color-mix(in srgb, var(--ui-accent) 45%, transparent);font-size:.82rem;line-height:1.45;margin-top:10px}
+.tip .btn{flex:none}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{height:38px;padding:0 14px;border-radius:11px;border:1px solid var(--ui-line);background:var(--ui-bg2);font-weight:600;font-size:.84rem;display:inline-flex;align-items:center;gap:6px;transition:.15s;color:var(--ui-text)}
 .btn:hover{border-color:var(--ui-accent)}
@@ -139,7 +247,6 @@ button{cursor:pointer}
 .section-title:first-child{margin-top:0}
 .counter{margin-left:auto;font-size:.8rem;color:var(--ui-muted)}
 .counter b{color:var(--ui-text)}
-
 .prize-row{display:grid;grid-template-columns:62px 1fr 40px 30px;gap:6px;align-items:center;padding:10px;border-radius:14px;background:var(--ui-bg2);border:1px solid var(--ui-line);margin-bottom:8px}
 .prize-row .inp{padding:8px 10px;border-radius:10px;background:var(--ui-bg)}
 .prize-row .p-label{grid-column:1 / 3;font-size:.8rem}
@@ -153,7 +260,6 @@ input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}
 details{border:1px dashed var(--ui-line);border-radius:14px;padding:10px 12px;margin-top:12px}
 details summary{cursor:pointer;font-weight:600;font-size:.86rem}
 details[open] summary{margin-bottom:10px}
-
 .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .preset{border:2px solid transparent;border-radius:14px;padding:0;overflow:hidden;background:var(--ui-bg2);text-align:left;transition:.15s}
 .preset[aria-pressed="true"]{border-color:var(--ui-accent)}
@@ -166,7 +272,6 @@ details[open] summary{margin-bottom:10px}
 .logo-box{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:1px dashed var(--ui-line);background:var(--ui-bg2)}
 .logo-box .prev{width:72px;height:72px;border-radius:12px;display:grid;place-items:center;background:repeating-conic-gradient(#2a2535 0 25%, #221e2c 0 50%) 50%/14px 14px;overflow:hidden;flex:none;color:var(--ui-muted);font-size:.7rem;text-align:center}
 .logo-box .prev img{max-width:100%;max-height:100%;object-fit:contain}
-
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:var(--ui-bg2);border:1px solid var(--ui-line);margin-bottom:8px;cursor:pointer}
 .switch b{display:block;font-size:.9rem;font-weight:600}
 .switch small{display:block;color:var(--ui-muted);font-size:.76rem;margin-top:2px}
@@ -174,61 +279,67 @@ details[open] summary{margin-bottom:10px}
 .switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
 .switch input:checked{background:var(--ui-accent)}
 .switch input:checked::after{left:23px}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mode{border:2px solid var(--ui-line);border-radius:14px;padding:12px;background:var(--ui-bg2);text-align:left;color:var(--ui-text)}
-.mode[aria-pressed="true"]{border-color:var(--ui-accent);background:color-mix(in srgb, var(--ui-accent) 14%, var(--ui-bg2))}
-.mode b{display:block;font-size:.9rem;margin:6px 0 2px}
-.mode small{color:var(--ui-muted);font-size:.74rem;line-height:1.35;display:block}
-.mode svg{width:34px;height:34px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cards.three{grid-template-columns:repeat(3,1fr)}
+.card-opt{border:2px solid var(--ui-line);border-radius:14px;padding:12px;background:var(--ui-bg2);text-align:left;color:var(--ui-text)}
+.card-opt[aria-pressed="true"]{border-color:var(--ui-accent);background:color-mix(in srgb, var(--ui-accent) 14%, var(--ui-bg2))}
+.card-opt b{display:block;font-size:.88rem;margin:6px 0 2px}
+.card-opt small{color:var(--ui-muted);font-size:.73rem;line-height:1.35;display:block}
+.card-opt svg{width:32px;height:32px}
+.fmt-ico{display:block;border:2px solid currentColor;border-radius:4px;opacity:.85}
 input[type=range]{width:100%;accent-color:var(--ui-accent)}
 
-/* ---------- modal ---------- */
-.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(5,3,12,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s}
+/* ================= winner modal (inside the frame) ================= */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:1em;background:rgba(5,3,12,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s}
+.fmt-story .modal{padding:260px 70px 300px}
+.fmt-wide .modal{padding:54px 96px}
 .modal.show{opacity:1;pointer-events:auto}
-.card{position:relative;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;border-radius:28px;padding:34px 28px 26px;text-align:center;background:linear-gradient(160deg, color-mix(in srgb, var(--bg2) 70%, #fff 6%), var(--bg1));border:1px solid var(--glass-border);box-shadow:0 30px 80px rgba(0,0,0,.5);transform:scale(.7) translateY(30px);transition:transform .5s cubic-bezier(.2,1.5,.4,1);isolation:isolate}
+.card{position:relative;width:min(35em,100%);max-height:100%;overflow:auto;border-radius:1.75em;padding:2.1em 1.75em 1.6em;text-align:center;background:linear-gradient(160deg, color-mix(in srgb, var(--bg2) 70%, #fff 6%), var(--bg1));border:1px solid var(--glass-border);box-shadow:0 1.9em 5em rgba(0,0,0,.5);transform:scale(.7) translateY(2em);transition:transform .5s cubic-bezier(.2,1.5,.4,1);isolation:isolate;scrollbar-width:none}
+.fmt-story .card{width:100%}
+.fmt-wide .card{width:min(44em,100%)}
 .modal.show .card{transform:none}
-.rays{position:absolute;left:50%;top:70px;width:520px;height:520px;margin:-260px 0 0 -260px;background:repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 35%, transparent) 0 8deg, transparent 8deg 20deg);border-radius:50%;mask:radial-gradient(circle, #000 20%, transparent 68%);-webkit-mask:radial-gradient(circle, #000 20%, transparent 68%);animation:spinr 16s linear infinite;z-index:-1;pointer-events:none}
+.rays{position:absolute;left:50%;top:4.4em;width:32em;height:32em;margin:-16em 0 0 -16em;background:repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 35%, transparent) 0 8deg, transparent 8deg 20deg);border-radius:50%;-webkit-mask:radial-gradient(circle, #000 20%, transparent 68%);mask:radial-gradient(circle, #000 20%, transparent 68%);animation:spinr 16s linear infinite;z-index:-1;pointer-events:none}
 @keyframes spinr{to{rotate:360deg}}
-.trophy{font-size:64px;line-height:1;animation:bounce 1.2s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 8px 16px rgba(0,0,0,.3))}
-@keyframes bounce{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(6deg)}}
-.card h3{margin:10px 0 4px;font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--muted);letter-spacing:.5px}
-.prize-tag{display:inline-flex;align-items:center;gap:8px;margin:6px 0 10px;padding:8px 16px;border-radius:999px;background:var(--pc);color:var(--pci);font-weight:700;box-shadow:0 8px 24px color-mix(in srgb, var(--pc) 45%, transparent)}
-.winner{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,6vw,3rem);line-height:1.05;margin:8px 0 18px;overflow-wrap:anywhere;background:linear-gradient(90deg,var(--text), var(--accent), var(--text));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.4s linear infinite, zoomin .7s cubic-bezier(.2,1.6,.4,1)}
+.trophy{font-size:4em;line-height:1;animation:bounce 1.2s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 .12em .25em rgba(0,0,0,.3))}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-.15em) rotate(6deg)}}
+.card h3{margin:.6em 0 .25em;font-family:var(--font-display);font-size:1.1em;font-weight:600;color:var(--muted);letter-spacing:.03em}
+.prize-tag{display:inline-flex;align-items:center;gap:.5em;margin:.4em 0 .6em;padding:.5em 1em;border-radius:99em;background:var(--pc);color:var(--pci);font-weight:700;box-shadow:0 .5em 1.5em color-mix(in srgb, var(--pc) 45%, transparent)}
+.winner{font-family:var(--font-display);font-weight:800;font-size:2.6em;line-height:1.05;margin:.2em 0 .45em;overflow-wrap:anywhere;background:linear-gradient(90deg,var(--text), var(--accent), var(--text));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.4s linear infinite, zoomin .7s cubic-bezier(.2,1.6,.4,1)}
+.fmt-free .winner{font-size:clamp(1.9rem,6vw,3rem)}
 @keyframes shine{to{background-position:-200% 0}}
 @keyframes zoomin{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
-.win-list{list-style:none;padding:0;margin:14px 0 18px;display:flex;flex-direction:column;gap:8px;text-align:left}
-.win-list li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.18);border:1px solid var(--glass-border);opacity:0;transform:translateY(14px) scale(.96);animation:rise .55s cubic-bezier(.2,1.4,.4,1) forwards}
-.win-list .slot-n{width:30px;height:30px;font-size:.78rem}
-.win-list .w{font-family:var(--font-display);font-weight:800;font-size:1.15rem;line-height:1.15;overflow-wrap:anywhere}
-.win-list .p{font-size:.78rem;color:var(--muted)}
+.win-list{list-style:none;padding:0;margin:.9em 0 1.1em;display:flex;flex-direction:column;gap:.5em;text-align:left}
+.win-list.two{display:grid;grid-template-columns:1fr 1fr}
+.win-list li{display:flex;align-items:center;gap:.75em;padding:.6em .9em;border-radius:.9em;background:rgba(0,0,0,.18);border:1px solid var(--glass-border);opacity:0;transform:translateY(.9em) scale(.96);animation:rise .55s cubic-bezier(.2,1.4,.4,1) forwards}
+.win-list .pn{width:1.9em;height:1.9em;font-size:.8em}
+.win-list .w{font-family:var(--font-display);font-weight:800;font-size:1.15em;line-height:1.15;overflow-wrap:anywhere}
+.win-list .p{font-size:.78em;color:var(--muted)}
 @keyframes rise{to{opacity:1;transform:none}}
-.card-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.cbtn{height:46px;padding:0 20px;border-radius:14px;border:1px solid var(--glass-border);background:var(--glass);font-weight:700;display:inline-flex;align-items:center;gap:8px}
-.cbtn.main{background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent)}
-.cbtn svg{width:17px;height:17px}
-.note{font-size:.8rem;color:var(--muted);margin:-6px 0 14px}
+.card-actions{display:flex;flex-wrap:wrap;gap:.6em;justify-content:center}
+.cbtn{height:2.9em;padding:0 1.25em;border-radius:.9em;border:1px solid var(--glass-border);background:var(--glass);font-weight:700;display:inline-flex;align-items:center;gap:.5em}
+.cbtn.main{background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 .5em 1.5em color-mix(in srgb, var(--accent) 40%, transparent)}
+.cbtn svg{width:1.05em;height:1.05em}
+.note{font-size:.8em;color:var(--muted);margin:-.4em 0 .9em}
 
-#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
-.toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
-.toast{background:#17141f;color:#fff;padding:10px 18px;border-radius:12px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:toast 3s ease forwards}
-@keyframes toast{0%{opacity:0;transform:translateY(10px)}10%,85%{opacity:1;transform:none}100%{opacity:0}}
-
-/* fullscreen/presentation: hide chrome a bit */
-body.present .hint{display:none}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:55}
+.toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:max-content;max-width:calc(100vw - 32px)}
+.toast{background:#17141f;color:#fff;padding:10px 18px;border-radius:12px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:toast 3.6s ease forwards;text-align:center}
+@keyframes toast{0%{opacity:0;transform:translateY(10px)}8%,88%{opacity:1;transform:none}100%{opacity:0}}
 
 @media (max-width: 900px){
-  .stage{grid-template-columns:1fr;padding-top:4px}
-  .panel{max-height:none}
-  .wheel-wrap{width:min(100%, 74vh)}
-  .btn-cfg span{display:none}
-  .btn-cfg{width:44px;padding:0;justify-content:center}
+  .fmt-free .stage{grid-template-columns:1fr;padding-top:4px}
+  .fmt-free .panel{max-height:none}
+  .fmt-free .draw-box.is-wheel{height:min(calc(100vh - 250px), calc(100vw - 32px))}
+  .fmt-free .draw-box.is-slots{height:max(440px, calc(100vh - 230px))}
 }
-@media (max-width: 520px){
-  .top{flex-wrap:wrap}
-  .brand img{height:52px}
-  .actions{width:100%;justify-content:flex-end}
-  .spin-btn{padding:14px 44px}
+@media (max-width: 640px){
+  .fmt-free .toolbar{position:absolute;top:12px;right:12px}
+  .fmt-free .top{padding-right:0}
+  .fmt-free .safe{padding-top:70px}
+  .toolbar .seg,.toolbar #btnGuides,.toolbar #btnRec,.toolbar .tb-sep{display:none}
+  .fmt-free .brand img{height:52px}
   .presets{grid-template-columns:repeat(2,1fr)}
+  .cards.three{grid-template-columns:1fr}
   .hint{display:none}
 }
 @media (prefers-reduced-motion: reduce){
@@ -236,61 +347,79 @@ body.present .hint{display:none}
 }
 </style>
 </head>
-<body>
-<div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><div class="sparkles"></div></div>
+<body class="fmt-free">
 
-<div class="app">
-  <header class="top">
-    <div class="brand">
-      <img id="logo" alt="" hidden>
-      <div class="tt">
-        <h1 id="title">Grande Sorteio</h1>
-        <p id="subtitle"></p>
-      </div>
-    </div>
-    <div class="actions">
-      <button class="icon-btn" id="btnMusic" title="Música (M)" aria-label="Ligar ou desligar música"></button>
-      <button class="icon-btn" id="btnSfx" title="Efeitos sonoros" aria-label="Ligar ou desligar efeitos sonoros"></button>
-      <button class="icon-btn" id="btnFull" title="Tela cheia (F)" aria-label="Tela cheia">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
-      </button>
-      <button class="btn-cfg" id="btnSettings" aria-label="Personalizar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-        <span>Personalizar</span>
-      </button>
-    </div>
-  </header>
+<div class="viewport" id="viewport">
+  <div class="frame" id="frame">
+    <div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><div class="sparkles"></div></div>
 
-  <main class="stage">
-    <section class="wheel-area">
-      <div class="now" id="now"><i class="dot"></i><span id="nowText">Pronto para girar</span></div>
-      <div class="wheel-wrap" id="wheelWrap">
-        <canvas id="wheel" aria-label="Roleta de sorteio" role="img"></canvas>
-        <div class="empty" id="emptyWheel">
-          <div>
-            <b>Nenhum participante na roleta</b><br>
-            <small>Cole a lista de nomes para começar.</small><br>
-            <button class="cbtn main" data-open="names">Adicionar nomes</button>
+    <div class="safe">
+      <header class="top">
+        <div class="brand">
+          <img id="logo" alt="" hidden>
+          <div class="tt">
+            <h1 id="title">Grande Sorteio</h1>
+            <p id="subtitle"></p>
           </div>
         </div>
-      </div>
-      <div class="controls">
-        <button class="spin-btn" id="btnSpin">GIRAR!</button>
-        <div class="hint">Pressione <kbd>Espaço</kbd> para girar · <kbd>F</kbd> tela cheia</div>
-      </div>
-    </section>
+      </header>
 
-    <aside class="panel" aria-label="Prêmios e ganhadores">
-      <div class="panel-head"><h2>Prêmios</h2><span class="pill" id="progress">0/0</span></div>
-      <div class="bar"><i id="progressBar"></i></div>
-      <ol class="slots" id="slotList" aria-live="polite"></ol>
-      <div class="panel-foot">
-        <button class="ghost" id="btnCopy" title="Copiar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>Copiar</button>
-        <button class="ghost" id="btnCsv" title="Baixar planilha CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></svg>CSV</button>
-        <button class="ghost" id="btnReset" title="Limpar ganhadores e começar de novo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Novo sorteio</button>
-      </div>
-    </aside>
-  </main>
+      <main class="stage">
+        <section class="draw">
+          <div class="now" id="now"><i class="dot"></i><span id="nowText">Pronto para sortear</span></div>
+          <div class="draw-box" id="drawBox">
+            <div class="wheel-wrap" id="wheelWrap"><canvas id="wheel" aria-label="Roleta de sorteio" role="img"></canvas></div>
+            <div class="slots-wrap" id="slotsWrap" hidden></div>
+            <div class="empty" id="emptyState">
+              <div>
+                <b>Nenhum participante</b><br>
+                <small>Cole a lista de nomes para começar.</small><br>
+                <button class="cbtn main" data-open="names">Adicionar nomes</button>
+              </div>
+            </div>
+          </div>
+          <div class="controls">
+            <button class="spin-btn" id="btnSpin">GIRAR!</button>
+            <div class="hint">Pressione <kbd>Espaço</kbd> para girar · <kbd>F</kbd> tela cheia</div>
+          </div>
+        </section>
+
+        <aside class="panel" aria-label="Prêmios e ganhadores">
+          <div class="panel-head"><h2>Prêmios</h2><span class="pill" id="progress">0/0</span></div>
+          <div class="bar"><i id="progressBar"></i></div>
+          <ol class="plist" id="prizeList" aria-live="polite"></ol>
+          <div class="panel-foot">
+            <button class="ghost" id="btnCopy" title="Copiar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>Copiar</button>
+            <button class="ghost" id="btnCsv" title="Baixar planilha CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></svg>CSV</button>
+            <button class="ghost" id="btnReset" title="Limpar ganhadores e começar de novo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Novo sorteio</button>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="foot" id="foot"></footer>
+    </div>
+
+    <div class="guides" aria-hidden="true"><div class="g-safe"></div><div class="g-label g-top">Zona do perfil / barra do app</div><div class="g-label g-bot">Zona de resposta / legenda</div></div>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-live="assertive"><div class="card" id="card"></div></div>
+    <canvas id="confetti"></canvas>
+  </div>
+</div>
+
+<!-- Floating toolbar: stays outside the recorded frame -->
+<div class="toolbar" id="toolbar">
+  <button class="tb spin-mini" id="tbSpin" title="Sortear (Espaço)">▶ Sortear</button>
+  <div class="seg" id="fmtSeg" role="group" aria-label="Formato da tela">
+    <button data-fmt="free" title="Tela livre (computador/TV)">Livre</button>
+    <button data-fmt="story" title="Stories / Reels 1080×1920">9:16</button>
+    <button data-fmt="wide" title="Vídeo horizontal 1920×1080">16:9</button>
+  </div>
+  <button class="tb" id="btnGuides" title="Guias de margem segura (G)" aria-label="Guias de margem segura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button>
+  <button class="tb rec" id="btnRec" title="Gravar vídeo do quadro com som (R)" aria-label="Gravar vídeo"></button>
+  <span class="tb-sep"></span>
+  <button class="tb" id="btnMusic" title="Música (M)" aria-label="Ligar ou desligar música"></button>
+  <button class="tb" id="btnSfx" title="Efeitos sonoros" aria-label="Ligar ou desligar efeitos sonoros"></button>
+  <button class="tb" id="btnFull" title="Tela cheia (F)" aria-label="Tela cheia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button class="tb primary" id="btnSettings" title="Personalizar" aria-label="Personalizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
 </div>
 
 <!-- Settings drawer -->
@@ -302,9 +431,10 @@ body.present .hint{display:none}
   </div>
   <nav class="tabs" role="tablist">
     <button role="tab" data-tab="prizes" aria-selected="true">🎁 Prêmios</button>
-    <button role="tab" data-tab="names">👥 Participantes</button>
-    <button role="tab" data-tab="look">🎨 Aparência</button>
+    <button role="tab" data-tab="names">👥 Nomes</button>
     <button role="tab" data-tab="draw">🎯 Sorteio</button>
+    <button role="tab" data-tab="video">🎬 Vídeo</button>
+    <button role="tab" data-tab="look">🎨 Visual</button>
     <button role="tab" data-tab="sound">🎵 Som</button>
   </nav>
   <div class="tab-body">
@@ -315,7 +445,7 @@ body.present .hint{display:none}
       <div class="row">
         <button class="btn primary" id="btnAddPrize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar prêmio</button>
       </div>
-      <p class="help">A ordem define a posição (1º, 2º…). Cada unidade vira um ponteiro na roleta. O "texto no ponteiro" é o rótulo curto mostrado na roleta — se ficar vazio, é gerado automaticamente (ex.: R$ 100).</p>
+      <p class="help">A ordem define a posição (1º, 2º…). Cada unidade vira um ponteiro na roleta ou uma coluna no caça-níquel. O "texto curto" aparece no ponteiro/coluna — se ficar vazio, é gerado automaticamente (ex.: R$ 100).</p>
       <details>
         <summary>Colar lista de prêmios em texto</summary>
         <textarea id="prizePaste" placeholder="4 X Cupom de R$ 100,00&#10;1 X 70,00&#10;1 X 50,00&#10;1 X 30,00"></textarea>
@@ -336,6 +466,74 @@ body.present .hint{display:none}
         <button class="btn danger" id="btnClearNames">Limpar</button>
       </div>
       <p class="help" id="dupWarn"></p>
+      <div class="tip" id="manyTip" hidden><span>💡 Com muitos participantes a roleta fica sem espaço para os nomes. O <b>caça-níquel</b> mostra cada nome em letra grande.</span><button class="btn primary" id="btnUseSlots">Usar caça-níquel</button></div>
+    </section>
+
+    <!-- DRAW -->
+    <section class="tab" data-panel="draw">
+      <div class="section-title">Tipo de sorteio</div>
+      <div class="cards">
+        <button class="card-opt" data-type="wheel">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="21" r="14"/><path d="M20 7v28M6 21h28M10 11l20 20M30 11 10 31" stroke-width="1.4"/><path d="M20 1v6" stroke-width="3" stroke-linecap="round"/></svg>
+          <b>Roleta</b><small>Clássica e divertida. Ideal para até ~80 nomes.</small>
+        </button>
+        <button class="card-opt" data-type="slots">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="34" height="26" rx="4"/><path d="M14 7v26M26 7v26M3 20h34" stroke-width="1.6"/></svg>
+          <b>Caça-níquel</b><small>Colunas com os nomes rolando. Ótimo para 200+ participantes.</small>
+        </button>
+      </div>
+      <div class="section-title">Como sortear</div>
+      <div class="cards">
+        <button class="card-opt" data-mode="multi">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="20" r="12"/><path d="M20 2v6M20 32v6M2 20h6M32 20h6M7 7l4 4M29 29l4 4M33 7l-4 4M7 33l4-4"/></svg>
+          <b>Todos de uma vez</b><small>Um ponteiro/coluna por prêmio. Um giro revela todos.</small>
+        </button>
+        <button class="card-opt" data-mode="single">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="22" r="13"/><path d="M20 2v10" stroke-width="3" stroke-linecap="round"/></svg>
+          <b>Um por vez</b><small>Um giro para cada prêmio, com revelação individual.</small>
+        </button>
+      </div>
+      <div style="height:12px"></div>
+      <label class="switch"><span><b>Do último para o primeiro</b><small>Sorteia do menor prêmio até o principal (mais suspense)</small></span><input type="checkbox" id="inReverse"></label>
+      <label class="switch"><span><b>Remover ganhadores</b><small>Cada pessoa ganha no máximo um prêmio</small></span><input type="checkbox" id="inRemove"></label>
+      <div class="field" style="margin-top:14px">
+        <label for="inDuration">Duração do giro: <b id="durVal"></b></label>
+        <input type="range" id="inDuration" min="3" max="20" step="1">
+      </div>
+
+      <div class="section-title">Resultado</div>
+      <div class="row">
+        <button class="btn" data-proxy="btnCopy">📋 Copiar</button>
+        <button class="btn" data-proxy="btnCsv">⬇️ Baixar CSV</button>
+        <button class="btn danger" data-proxy="btnReset">↺ Novo sorteio</button>
+      </div>
+
+      <div class="section-title">Backup e white label</div>
+      <p class="help" style="margin-top:0">Exporte a configuração (prêmios, nomes, tema e logo) para reutilizar em outro computador ou criar modelos por cliente.</p>
+      <div class="row">
+        <button class="btn" id="btnExport">⬇️ Exportar configuração</button>
+        <label class="btn" style="cursor:pointer">⬆️ Importar<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+        <button class="btn danger" id="btnFactory">Restaurar padrão</button>
+      </div>
+    </section>
+
+    <!-- VIDEO -->
+    <section class="tab" data-panel="video">
+      <div class="section-title">Formato da tela</div>
+      <div class="cards three">
+        <button class="card-opt" data-format="free"><span class="fmt-ico" style="width:38px;height:26px"></span><b>Livre</b><small>Ocupa a tela toda (computador, TV, telão).</small></button>
+        <button class="card-opt" data-format="story"><span class="fmt-ico" style="width:18px;height:32px"></span><b>Stories 9:16</b><small>1080×1920 com margens seguras do Instagram/TikTok.</small></button>
+        <button class="card-opt" data-format="wide"><span class="fmt-ico" style="width:42px;height:24px"></span><b>Vídeo 16:9</b><small>1920×1080 para YouTube, feed e apresentações.</small></button>
+      </div>
+      <p class="help">Nos formatos de vídeo, tudo (logo, título, sorteio, prêmios, ganhadores e rodapé) fica dentro da área segura. A barra de ferramentas some sozinha e não aparece na gravação.</p>
+      <label class="switch" style="margin-top:12px"><span><b>Mostrar guias de margem</b><small>Só para conferir o enquadramento — desligue antes de gravar (atalho G)</small></span><input type="checkbox" id="inGuides"></label>
+      <label class="switch"><span><b>Botão "GIRAR" dentro do vídeo</b><small>Desligado: sorteie pelo botão ▶ da barra ou pela tecla Espaço</small></span><input type="checkbox" id="inSpinInVideo"></label>
+      <label class="switch"><span><b>Rodapé com informações</b><small>Nº de participantes e data do sorteio</small></span><input type="checkbox" id="inFooter"></label>
+      <div class="field"><label for="inFooterText">Texto extra no rodapé</label><input class="inp" id="inFooterText" maxlength="120" placeholder="Ex.: @suaempresa · Regulamento no link da bio"></div>
+
+      <div class="section-title">Gravar vídeo</div>
+      <p class="help" style="margin-top:0">Grava somente o quadro do formato, já com música e efeitos. Funciona no Chrome/Edge do computador: clique em <b>Gravar</b> (ou tecla <b>R</b>), escolha <b>esta aba</b> e faça o sorteio com a tecla <b>Espaço</b>. Durante a gravação a barra de ferramentas some; para parar e baixar, pressione <b>R</b> de novo ou clique em "Parar de compartilhar" do navegador. Dica: use tela cheia (F) para a melhor resolução — o vídeo sai no tamanho em que o quadro aparece na tela.</p>
+      <button class="btn primary" id="btnRec2">● Gravar vídeo</button>
     </section>
 
     <!-- LOOK -->
@@ -352,15 +550,13 @@ body.present .hint{display:none}
               <label class="btn primary" style="cursor:pointer">Enviar imagem<input type="file" id="logoFile" accept="image/*" hidden></label>
               <button class="btn danger" id="btnLogoRemove">Remover</button>
             </div>
-            <p class="help" style="margin-bottom:0">PNG com fundo transparente fica melhor. Também aparece no centro da roleta.</p>
+            <p class="help" style="margin-bottom:0">PNG com fundo transparente fica melhor.</p>
           </div>
         </div>
       </div>
       <label class="switch"><span><b>Logo no centro da roleta</b><small>Mostra a logo no miolo da roleta</small></span><input type="checkbox" id="inHubLogo"></label>
-
       <div class="section-title">Tema</div>
       <div class="presets" id="presets"></div>
-
       <div class="section-title">Cores personalizadas</div>
       <div class="colors">
         <label class="color-field"><input type="color" id="cBg1">Fundo 1</label>
@@ -375,41 +571,11 @@ body.present .hint{display:none}
       <label class="switch"><span><b>Confetes</b><small>Chuva de confetes ao revelar ganhadores</small></span><input type="checkbox" id="inConfetti"></label>
     </section>
 
-    <!-- DRAW -->
-    <section class="tab" data-panel="draw">
-      <div class="section-title">Como sortear</div>
-      <div class="modes">
-        <button class="mode" data-mode="multi">
-          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="20" r="12"/><path d="M20 2v6M20 32v6M2 20h6M32 20h6M7 7l4 4M29 29l4 4M33 7l-4 4M7 33l4-4"/></svg>
-          <b>Vários ponteiros</b><small>Um ponteiro por prêmio. Um único giro revela todos os ganhadores.</small>
-        </button>
-        <button class="mode" data-mode="single">
-          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="22" r="13"/><path d="M20 2v10" stroke-width="3" stroke-linecap="round"/></svg>
-          <b>Um por vez</b><small>Um giro para cada prêmio, com revelação individual.</small>
-        </button>
-      </div>
-      <div style="height:12px"></div>
-      <label class="switch"><span><b>Do último para o primeiro</b><small>Sorteia do menor prêmio até o principal (mais suspense)</small></span><input type="checkbox" id="inReverse"></label>
-      <label class="switch"><span><b>Remover ganhadores da roleta</b><small>Cada pessoa ganha no máximo um prêmio</small></span><input type="checkbox" id="inRemove"></label>
-      <div class="field" style="margin-top:14px">
-        <label for="inDuration">Duração do giro: <b id="durVal"></b></label>
-        <input type="range" id="inDuration" min="3" max="20" step="1">
-      </div>
-
-      <div class="section-title">Backup e white label</div>
-      <p class="help" style="margin-top:0">Exporte a configuração (prêmios, nomes, tema e logo) para reutilizar em outro computador ou criar modelos por cliente.</p>
-      <div class="row">
-        <button class="btn" id="btnExport">⬇️ Exportar configuração</button>
-        <label class="btn" style="cursor:pointer">⬆️ Importar<input type="file" id="importFile" accept="application/json,.json" hidden></label>
-        <button class="btn danger" id="btnFactory">Restaurar padrão</button>
-      </div>
-    </section>
-
     <!-- SOUND -->
     <section class="tab" data-panel="sound">
       <div class="section-title">Música e efeitos</div>
       <label class="switch"><span><b>Música de fundo</b><small>Toca em loop durante o sorteio</small></span><input type="checkbox" id="inMusic"></label>
-      <label class="switch"><span><b>Efeitos sonoros</b><small>Cliques da roleta, fanfarra e aplausos</small></span><input type="checkbox" id="inSfx"></label>
+      <label class="switch"><span><b>Efeitos sonoros</b><small>Cliques, fanfarra e aplausos</small></span><input type="checkbox" id="inSfx"></label>
       <div class="field" style="margin-top:14px">
         <label for="inVolume">Volume: <b id="volVal"></b></label>
         <input type="range" id="inVolume" min="0" max="1" step="0.05">
@@ -433,8 +599,6 @@ body.present .hint{display:none}
   </div>
 </aside>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-live="assertive"><div class="card" id="card"></div></div>
-<canvas id="confetti"></canvas>
 <div class="toasts" id="toasts"></div>
 
 <script>
@@ -452,6 +616,7 @@ const gcd = (a, b) => (b ? gcd(b, a % b) : a);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const norm = s => s.toLocaleUpperCase('pt-BR').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const reducedMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Crypto-backed randomness: every name has the same chance.
 function rand() {
@@ -459,6 +624,11 @@ function rand() {
   return Math.random();
 }
 const randInt = n => Math.floor(rand() * n);
+function shuffled(a) {
+  a = [...a];
+  for (let i = a.length - 1; i > 0; i--) { const j = randInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
 
 function hexToRgb(h) {
   h = String(h || '#000').replace('#', '');
@@ -475,17 +645,18 @@ const rgba = (h, a) => { const [r, g, b] = hexToRgb(h); return `rgba(${r},${g},$
 const shade = (h, p) => { const [r, g, b] = hexToRgb(h); const f = v => Math.round(p < 0 ? v * (1 + p) : v + (255 - v) * p); return `rgb(${f(r)},${f(g)},${f(b)})`; };
 
 function toast(msg) {
+  if (document.body.classList.contains('recording')) return;
   const el = document.createElement('div');
   el.className = 'toast'; el.textContent = msg;
   $('#toasts').appendChild(el);
-  setTimeout(() => el.remove(), 3100);
+  setTimeout(() => el.remove(), 3700);
 }
 function download(name, content, type) {
   const blob = content instanceof Blob ? content : new Blob([content], { type });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
 /* ================= config ================= */
@@ -523,7 +694,8 @@ function defaults() {
       { id: uid(), qty: 1, name: 'Cupom de R$ 30,00', label: '', color: '#4cc9f0' },
     ],
     namesText: DEFAULT_NAMES,
-    mode: 'multi', reverseOrder: true, removeWinners: true, spinSeconds: 8, confetti: true,
+    drawType: 'wheel', mode: 'multi', reverseOrder: true, removeWinners: true, spinSeconds: 8, confetti: true,
+    format: 'free', guides: false, spinInVideo: false, showFooter: true, footerText: '',
     sound: { music: false, sfx: true, volume: 0.7, source: 'synth', fileName: '' },
     results: {}, absent: [],
   };
@@ -537,6 +709,8 @@ function merge(base, saved) {
   out.prizes = out.prizes.map(p => ({ id: p.id || uid(), qty: p.qty ?? 1, name: p.name || '', label: p.label || '', color: p.color || '#ffd23f' }));
   if (!out.results || typeof out.results !== 'object') out.results = {};
   if (!Array.isArray(out.absent)) out.absent = [];
+  if (!['wheel', 'slots'].includes(out.drawType)) out.drawType = 'wheel';
+  if (!['free', 'story', 'wide'].includes(out.format)) out.format = 'free';
   return out;
 }
 function load() {
@@ -585,6 +759,22 @@ function remainingNames() {
   if (cfg.removeWinners) getSlots().forEach(s => { const r = cfg.results[s.key]; if (r) ex.add(norm(r.winner)); });
   return parseNames(cfg.namesText).filter(n => !ex.has(norm(n)));
 }
+// Slots drawn in the next spin, in priority order (first = revealed first).
+function computeTargets() {
+  const pend = pendingSlots();
+  if (!pend.length || !S.names.length) return [];
+  if (cfg.mode === 'single') return [pend[0]];
+  const cap = cfg.drawType === 'slots' ? 12 : 60;
+  return pend.slice(0, Math.min(pend.length, S.names.length, cap));
+}
+
+/* ================= state ================= */
+const S = { names: [], targets: [], spinning: false, needsRebuild: false, scale: 1, celebrating: 0, logoImg: null, highlight: [], ready: false };
+const W = { angle: -0.3, spin: null, pointers: [], flaps: [], lastIdx: [] };          // wheel
+const L = { size: 0, c: 0, R: 0, Rw: 0, rim: 0, dpr: 1 };                               // wheel layout
+const R = { reels: [], v: 5, mid: 2, ch: 40, done: true, tickReel: null };              // slot machine
+const frame = $('#frame'), box = $('#drawBox');
+let modalOpen = false;
 
 /* ================= theme & header ================= */
 function applyTheme() {
@@ -598,107 +788,151 @@ function applyTheme() {
   r.setProperty('--muted', rgba(t.text, 0.72));
   r.setProperty('--c1', t.palette[0] || t.accent);
   r.setProperty('--c2', t.palette[2] || t.palette[1] || t.accent);
-  document.querySelector('meta[name=theme-color]')?.setAttribute('content', t.bg1);
 }
 function renderHeader() {
   $('#title').textContent = cfg.title || '';
   $('#subtitle').textContent = cfg.subtitle || '';
   $('#subtitle').hidden = !cfg.subtitle;
-  document.title = cfg.title ? cfg.title + ' · Roleta' : 'Roleta de Prêmios';
+  document.title = cfg.title || 'Sorteio';
   const img = $('#logo');
   if (cfg.logo) { img.src = cfg.logo; img.hidden = false; } else { img.removeAttribute('src'); img.hidden = true; }
-  const prev = $('#logoPrev');
-  prev.innerHTML = cfg.logo ? `<img src="${cfg.logo}" alt="">` : 'sem logo';
+  $('#logoPrev').innerHTML = cfg.logo ? `<img src="${cfg.logo}" alt="">` : 'sem logo';
   S.logoImg = null;
   if (cfg.logo) { const im = new Image(); im.onload = () => { S.logoImg = im; }; im.src = cfg.logo; }
 }
-
-/* ================= wheel state & layout ================= */
-const canvas = $('#wheel'), ctx = canvas.getContext('2d');
-const off = document.createElement('canvas');
-const S = {
-  angle: -0.3, spinning: false, spin: null,
-  names: [], pointers: [], highlight: [], flaps: [], lastIdx: [],
-  needsRebuild: false, logoImg: null, lastTick: 0, celebrating: 0,
-};
-const L = { size: 0, c: 0, R: 0, Rw: 0, rim: 0, dpr: 1 };
-
-function computePointers() {
-  const pend = pendingSlots();
-  const N = S.names.length;
-  if (cfg.mode === 'single' || pend.length === 0) {
-    return [{ angle: -Math.PI / 2, slot: pend[0] || null }];
-  }
-  const P = Math.max(1, Math.min(pend.length, N || 1));
-  return pend.slice(0, P).map((slot, k) => ({ angle: -Math.PI / 2 + (k * TAU) / P, slot }));
+function updateFoot() {
+  const n = parseNames(cfg.namesText).length;
+  const parts = [`${n} ${n === 1 ? 'participante' : 'participantes'}`, `Sorteio de ${new Date().toLocaleDateString('pt-BR')}`];
+  if (cfg.footerText && cfg.footerText.trim()) parts.push(cfg.footerText.trim());
+  $('#foot').textContent = parts.join('  ·  ');
 }
 
-function layout() {
+/* ================= format / frame ================= */
+const FORMATS = { story: [1080, 1920], wide: [1920, 1080] };
+function applyFormat() {
+  const b = document.body;
+  b.classList.remove('fmt-free', 'fmt-story', 'fmt-wide', 'fmt-fixed');
+  b.classList.add('fmt-' + cfg.format);
+  if (cfg.format !== 'free') b.classList.add('fmt-fixed');
+  b.classList.toggle('show-guides', !!cfg.guides);
+  b.classList.toggle('show-spin', !!cfg.spinInVideo);
+  b.classList.toggle('no-foot', !cfg.showFooter);
+  $$('#fmtSeg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.fmt === cfg.format)));
+  $$('[data-format]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.format === cfg.format)));
+  $('#btnGuides').classList.toggle('on', !!cfg.guides);
+  fitFrame();
+  fitList();
+  poke();
+}
+function fitFrame() {
+  if (cfg.format === 'free') { S.scale = 1; frame.style.removeProperty('--s'); }
+  else {
+    const [w, h] = FORMATS[cfg.format];
+    S.scale = Math.min(innerWidth / w, innerHeight / h);
+    frame.style.setProperty('--s', S.scale);
+  }
+  const tb = $('#toolbar');
+  document.documentElement.style.setProperty('--tbw', (tb.offsetWidth + 24) + 'px');
+  Confetti.resize();
+  if (S.ready) relayout();
+}
+function relayout() {
+  if (cfg.drawType === 'slots') {
+    if (S.spinning || modalOpen) S.needsRebuild = true; else buildReels();
+  } else layoutWheel();
+}
+
+// Toolbar auto-hides in video formats so it never ends up in a recording.
+let idleTimer;
+function poke() {
+  document.body.classList.remove('idle');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (cfg.format !== 'free' && !$('#drawer').classList.contains('show')) document.body.classList.add('idle');
+  }, 2600);
+}
+['mousemove', 'pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, poke, { passive: true }));
+
+/* ================= build the draw (wheel or slots) ================= */
+function buildDraw() {
+  if (S.spinning || modalOpen) { S.needsRebuild = true; return; }
+  S.needsRebuild = false;
+  S.names = remainingNames();
+  S.targets = computeTargets();
+  const isWheel = cfg.drawType !== 'slots';
+  $('#wheelWrap').hidden = !isWheel;
+  $('#slotsWrap').hidden = isWheel;
+  box.classList.toggle('is-wheel', isWheel);
+  box.classList.toggle('is-slots', !isWheel);
+  if (isWheel) {
+    W.pointers = pointersFor(S.targets);
+    W.flaps = W.pointers.map(() => 0);
+    layoutWheel();
+  } else {
+    L.size = 0;
+    buildReels();
+  }
+  $('#emptyState').classList.toggle('show', S.names.length === 0);
+  S.ready = true;
+  updateNow(); updateSpinBtn(); updateFoot();
+}
+
+/* ================= wheel ================= */
+const canvas = $('#wheel'), ctx = canvas.getContext('2d');
+const off = document.createElement('canvas');
+
+function pointersFor(targets) {
+  if (!targets.length) return [{ angle: -Math.PI / 2, slot: null }];
+  const P = targets.length;
+  return targets.map((slot, k) => ({ angle: -Math.PI / 2 + (k * TAU) / P, slot }));
+}
+function layoutWheel() {
+  if (cfg.drawType === 'slots') return;
   const wrap = $('#wheelWrap');
-  const rect = wrap.getBoundingClientRect();
-  const css = Math.max(220, Math.floor(Math.min(rect.width, rect.height || rect.width)));
-  L.dpr = Math.min(2, window.devicePixelRatio || 1);
+  const css = Math.max(200, Math.floor(Math.min(box.clientWidth, box.clientHeight) || 300));
+  wrap.style.width = wrap.style.height = css + 'px';
+  L.dpr = clamp(S.scale * (window.devicePixelRatio || 1), 1, 3);
   L.size = Math.round(css * L.dpr);
   canvas.width = canvas.height = L.size;
   L.c = L.size / 2;
-  L.R = (L.size / 2) * (cfg.mode === 'multi' && S.pointers.length > 1 ? (css < 520 ? 0.72 : 0.78) : 0.86);
+  L.R = (L.size / 2) * (W.pointers.length > 1 ? (css < 520 ? 0.72 : 0.78) : 0.86);
   L.rim = Math.max(10 * L.dpr, L.R * 0.065);
   L.Rw = L.R - L.rim;
   renderWheelImage();
 }
-
-function buildWheel() {
-  if (S.spinning || modalOpen) { S.needsRebuild = true; return; }
-  S.needsRebuild = false;
-  S.names = remainingNames();
-  S.pointers = computePointers();
-  S.flaps = S.pointers.map(() => 0);
-  layout();
-  $('#emptyWheel').classList.toggle('show', S.names.length === 0);
-  updateNow();
-  updateSpinBtn();
-}
-
 function fitText(g, text, maxW) {
   if (g.measureText(text).width <= maxW) return text;
   let lo = 0, hi = text.length;
   while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (g.measureText(text.slice(0, mid) + '…').width <= maxW) lo = mid; else hi = mid - 1; }
   return text.slice(0, lo).trimEnd() + '…';
 }
-
 function segColor(i, N) {
   const pal = cfg.theme.palette;
   let c = pal[i % pal.length];
   if (N > 1 && i === N - 1 && pal.length > 2 && (N - 1) % pal.length === 0) c = pal[Math.floor(pal.length / 2)];
   return c;
 }
-
 function renderWheelImage() {
+  if (!L.size) return;
   const Rw = L.Rw, d = Math.ceil(Rw * 2) + 2;
   off.width = off.height = d;
   const g = off.getContext('2d');
   g.clearRect(0, 0, d, d);
   g.save(); g.translate(d / 2, d / 2);
   const names = S.names, N = names.length;
-  if (!N) {
-    g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.fillStyle = 'rgba(255,255,255,.1)'; g.fill();
-    g.restore(); return;
-  }
+  if (!N) { g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.fillStyle = 'rgba(255,255,255,.1)'; g.fill(); g.restore(); return; }
   const s = TAU / N;
   for (let i = 0; i < N; i++) {
     g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath();
     g.fillStyle = segColor(i, N); g.fill();
   }
-  // depth shading
   const sh = g.createRadialGradient(0, 0, Rw * 0.15, 0, 0, Rw);
   sh.addColorStop(0, 'rgba(255,255,255,.22)'); sh.addColorStop(0.55, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,.25)');
   g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.fillStyle = sh; g.fill();
-  // separators
   if (N > 1 && N <= 240) {
     g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = Math.max(1, L.dpr * (N > 60 ? 0.7 : 1.5));
     for (let i = 0; i < N; i++) { const a = i * s; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * Rw, Math.sin(a) * Rw); g.stroke(); }
   }
-  // labels
   const fs = Math.min(Rw * 0.072, s * Rw * 0.5);
   if (fs >= 6.5 * L.dpr) {
     g.textAlign = 'right'; g.textBaseline = 'middle';
@@ -716,8 +950,6 @@ function renderWheelImage() {
   }
   g.restore();
 }
-
-/* ================= drawing ================= */
 function roundRect(g, x, y, w, h, r) {
   g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
   g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
@@ -726,49 +958,40 @@ function idxAt(phi, angle) {
   const N = S.names.length; if (!N) return -1;
   return Math.floor(mod(phi - angle, TAU) / (TAU / N)) % N;
 }
-
-function draw(t) {
-  const g = ctx, { R, Rw, rim, dpr } = L, accent = cfg.theme.accent;
+function drawWheel(t) {
+  const g = ctx, { R: Rr, Rw, rim, dpr } = L, accent = cfg.theme.accent;
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, L.size, L.size);
   g.translate(L.c, L.c);
-
-  // glow + rim
+  const celebrating = S.celebrating > t;
   g.save();
-  g.shadowColor = rgba(accent, S.celebrating > t ? 0.85 : 0.45);
-  g.shadowBlur = R * (S.celebrating > t ? 0.22 + 0.06 * Math.sin(t / 120) : 0.14);
-  g.beginPath(); g.arc(0, 0, R, 0, TAU);
-  const rg = g.createLinearGradient(-R, -R, R, R);
+  g.shadowColor = rgba(accent, celebrating ? 0.85 : 0.45);
+  g.shadowBlur = Rr * (celebrating ? 0.22 + 0.06 * Math.sin(t / 120) : 0.14);
+  g.beginPath(); g.arc(0, 0, Rr, 0, TAU);
+  const rg = g.createLinearGradient(-Rr, -Rr, Rr, Rr);
   rg.addColorStop(0, shade(accent, 0.35)); rg.addColorStop(0.5, shade(accent, -0.35)); rg.addColorStop(1, shade(accent, 0.15));
   g.fillStyle = rg; g.fill();
   g.restore();
 
-  // rotating wheel
-  g.save(); g.rotate(S.angle);
+  g.save(); g.rotate(W.angle);
   g.drawImage(off, -off.width / 2, -off.height / 2);
   const N = S.names.length;
   if (S.highlight.length && N) {
     const s = TAU / N, set = new Set(S.highlight);
     g.fillStyle = 'rgba(0,0,0,.42)';
-    if (N <= 3000) {
-      for (let i = 0; i < N; i++) {
-        if (set.has(i)) continue;
-        g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath(); g.fill();
-      }
+    if (N <= 3000) for (let i = 0; i < N; i++) {
+      if (set.has(i)) continue;
+      g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath(); g.fill();
     }
-    const pulse = 0.18 + 0.14 * Math.sin(t / 160);
-    g.fillStyle = `rgba(255,255,255,${pulse})`;
+    g.fillStyle = `rgba(255,255,255,${0.18 + 0.14 * Math.sin(t / 160)})`;
     g.strokeStyle = '#fff'; g.lineWidth = 3 * dpr;
     set.forEach(i => { g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath(); g.fill(); g.stroke(); });
   }
   g.restore();
 
-  // inner rim shadow
   g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.lineWidth = 3 * dpr; g.strokeStyle = 'rgba(0,0,0,.25)'; g.stroke();
 
-  // bulbs
-  const nb = clamp(Math.round(R / (11 * dpr)), 16, 44), br = rim * 0.26, rr = Rw + rim / 2;
-  const celebrating = S.celebrating > t;
+  const nb = clamp(Math.round(Rr / (11 * dpr)), 16, 44), br = rim * 0.26, rr = Rw + rim / 2;
   for (let i = 0; i < nb; i++) {
     let on;
     if (S.spinning) on = (i + Math.floor(t / 60)) % 3 === 0;
@@ -780,17 +1003,16 @@ function draw(t) {
     else { g.fillStyle = 'rgba(255,255,255,.28)'; g.fill(); }
   }
 
-  // hub
   const hr = Rw * 0.17;
+  const useLogo = cfg.hubLogo && S.logoImg;
   g.save(); g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = hr * 0.4;
   g.beginPath(); g.arc(0, 0, hr, 0, TAU);
   const hg = g.createRadialGradient(-hr * 0.3, -hr * 0.3, hr * 0.1, 0, 0, hr);
-  const useLogo = cfg.hubLogo && S.logoImg;
   hg.addColorStop(0, useLogo ? '#ffffff' : shade(accent, 0.45)); hg.addColorStop(1, useLogo ? '#eeeeee' : accent);
   g.fillStyle = hg; g.fill(); g.restore();
   g.lineWidth = Math.max(3 * dpr, hr * 0.1); g.strokeStyle = '#fff'; g.beginPath(); g.arc(0, 0, hr, 0, TAU); g.stroke();
   if (useLogo) {
-    const im = S.logoImg, box = hr * 1.45, sc = Math.min(box / im.width, box / im.height);
+    const im = S.logoImg, bx = hr * 1.45, sc = Math.min(bx / im.width, bx / im.height);
     g.save(); g.beginPath(); g.arc(0, 0, hr * 0.92, 0, TAU); g.clip();
     g.drawImage(im, -im.width * sc / 2, -im.height * sc / 2, im.width * sc, im.height * sc); g.restore();
   } else {
@@ -799,19 +1021,17 @@ function draw(t) {
     g.fillText(S.spinning ? '★' : 'GIRAR', 0, hr * 0.04);
   }
 
-  // pointers
-  const P = S.pointers.length;
-  const pw = Math.min(R * 0.085, P > 1 ? (TAU * R / P) * 0.38 : Infinity);
-  S.pointers.forEach((p, k) => drawPointer(g, p, k, pw, t));
+  const P = W.pointers.length;
+  const pw = Math.min(Rr * 0.085, P > 1 ? (TAU * Rr / P) * 0.38 : Infinity);
+  W.pointers.forEach((p, k) => drawPointer(g, p, k, pw, t));
 }
-
 function drawPointer(g, p, k, pw, t) {
-  const { R, Rw, rim, dpr } = L;
+  const { R: Rr, Rw, rim, dpr } = L;
   const color = p.slot ? p.slot.color : cfg.theme.accent;
-  const pivot = R + rim * 0.15;
+  const pivot = Rr + rim * 0.15;
   const len = pivot - Rw + pw * 0.55;
   const won = S.highlight.length && !S.spinning;
-  g.save(); g.rotate(p.angle); g.translate(pivot, 0); g.rotate(-(S.flaps[k] || 0));
+  g.save(); g.rotate(p.angle); g.translate(pivot, 0); g.rotate(-(W.flaps[k] || 0));
   g.shadowColor = 'rgba(0,0,0,.4)'; g.shadowBlur = pw * 0.35; g.shadowOffsetY = 2 * dpr;
   g.beginPath();
   g.moveTo(-len, 0);
@@ -827,17 +1047,15 @@ function drawPointer(g, p, k, pw, t) {
   g.beginPath(); g.arc(pw * 0.15, 0, pw * 0.2, 0, TAU); g.fillStyle = '#fff'; g.fill();
   g.restore();
 
-  // badge with prize label (multi mode)
-  if (!p.slot || S.pointers.length < 2) return;
+  if (!p.slot || W.pointers.length < 2) return;
   const fs = clamp(pw * 0.62, 9 * dpr, L.size * 0.026);
   g.font = `800 ${fs}px Poppins, system-ui, sans-serif`;
   const label = fitText(g, p.slot.label, L.size * 0.12);
   const bw = g.measureText(label).width + fs * 1.1, bh = fs * 1.6;
   const cx = Math.cos(p.angle), cy = Math.sin(p.angle);
   const dist = pivot + pw * 0.75 + Math.abs(cx) * bw / 2 + Math.abs(cy) * bh / 2 + 3 * dpr;
-  const x = cx * dist, y = cy * dist;
   const sc = won ? 1 + 0.07 * Math.sin(t / 150 + k) : 1;
-  g.save(); g.translate(x, y); g.scale(sc, sc);
+  g.save(); g.translate(cx * dist, cy * dist); g.scale(sc, sc);
   g.shadowColor = 'rgba(0,0,0,.3)'; g.shadowBlur = 6 * dpr;
   roundRect(g, -bw / 2, -bh / 2, bw, bh, bh / 2); g.fillStyle = color; g.fill();
   g.shadowColor = 'transparent'; g.lineWidth = 1.5 * dpr; g.strokeStyle = 'rgba(255,255,255,.85)'; g.stroke();
@@ -845,111 +1063,256 @@ function drawPointer(g, p, k, pw, t) {
   g.fillText(label, 0, fs * 0.05);
   g.restore();
 }
-
-/* ================= spin ================= */
-const easeOut = p => 1 - Math.pow(1 - p, 4);
-
-function spin() {
-  if (S.spinning) return;
-  if (modalOpen) closeModal();
-  if (S.needsRebuild) buildWheel();
-  Sound.unlock();
-  const N = S.names.length;
-  if (!N) { toast('Adicione participantes para sortear.'); openDrawer('names'); return; }
-  if (!S.pointers[0] || !S.pointers[0].slot) {
-    toast(getSlots().length ? 'Todos os prêmios já foram sorteados! 🎉' : 'Cadastre ao menos um prêmio.');
-    if (!getSlots().length) openDrawer('prizes');
-    return;
-  }
-  const s = TAU / N, P = S.pointers.length;
+const easeOutQuart = p => 1 - Math.pow(1 - p, 4);
+function spinWheel() {
+  const N = S.names.length, s = TAU / N, P = W.pointers.length;
   let target = null;
   if (P === 1) {
     const idx = randInt(N), offs = 0.15 + rand() * 0.7;
-    target = mod(S.pointers[0].angle - (idx + offs) * s, TAU);
+    target = mod(W.pointers[0].angle - (idx + offs) * s, TAU);
   } else {
     // Uniform random rotation; pointers are evenly spaced so each one lands on a distinct name.
     const q = P / gcd(N, P), m = Math.min(0.18, 0.35 / q);
     for (let i = 0; i < 800 && target === null; i++) {
       const th = rand() * TAU;
-      const ok = S.pointers.every(p => { const a = mod(p.angle - th, TAU) / s; const f = a - Math.floor(a); return f > m && f < 1 - m; });
+      const ok = W.pointers.every(p => { const a = mod(p.angle - th, TAU) / s; const f = a - Math.floor(a); return f > m && f < 1 - m; });
       if (ok) target = th;
     }
     if (target === null) target = rand() * TAU;
   }
   const turns = Math.round(cfg.spinSeconds * 0.9) + 3;
-  const from = S.angle;
-  S.spin = { from, to: from + turns * TAU + mod(target - from, TAU), t0: performance.now(), dur: cfg.spinSeconds * 1000 };
-  S.spinning = true; S.highlight = [];
-  S.lastIdx = S.pointers.map(p => idxAt(p.angle, from));
-  updateSpinBtn(); updateNow();
-  Sound.whoosh(); Sound.duck(true);
+  const from = W.angle;
+  W.spin = { from, to: from + turns * TAU + mod(target - from, TAU), t0: performance.now(), dur: cfg.spinSeconds * 1000 };
+  W.lastIdx = W.pointers.map(p => idxAt(p.angle, from));
 }
-
-function stepSpin(t) {
-  const sp = S.spin;
+function stepWheel(t) {
+  const sp = W.spin; if (!sp) return;
   const p = clamp((t - sp.t0) / sp.dur, 0, 1);
-  S.angle = sp.from + (sp.to - sp.from) * easeOut(p);
-  S.pointers.forEach((ptr, k) => {
-    const i = idxAt(ptr.angle, S.angle);
-    if (i !== S.lastIdx[k]) {
-      S.lastIdx[k] = i;
-      S.flaps[k] = Math.min(0.55, (S.flaps[k] || 0) + 0.32);
+  W.angle = sp.from + (sp.to - sp.from) * easeOutQuart(p);
+  W.pointers.forEach((ptr, k) => {
+    const i = idxAt(ptr.angle, W.angle);
+    if (i !== W.lastIdx[k]) {
+      W.lastIdx[k] = i;
+      W.flaps[k] = Math.min(0.55, (W.flaps[k] || 0) + 0.32);
       if (k === 0) Sound.tick();
     }
   });
   if (p >= 1) {
-    S.spinning = false;
-    S.angle = mod(sp.to, TAU);
-    onSpinEnd();
+    W.spin = null;
+    W.angle = mod(sp.to, TAU);
+    const wins = [];
+    W.pointers.forEach(ptr => {
+      if (!ptr.slot) return;
+      const i = idxAt(ptr.angle, W.angle);
+      if (S.names[i] != null) wins.push({ slot: ptr.slot, name: S.names[i], idx: i });
+    });
+    S.highlight = wins.map(w => w.idx);
+    finishSpin(wins);
   }
 }
 
-function onSpinEnd() {
-  const wins = [];
-  S.pointers.forEach(p => {
-    if (!p.slot) return;
-    const i = idxAt(p.angle, S.angle);
-    const name = S.names[i];
-    if (name == null) return;
-    cfg.results[p.slot.key] = { winner: name, at: Date.now() };
-    wins.push({ slot: p.slot, name, idx: i });
+/* ================= slot machine ================= */
+function buildReels() {
+  const wrap = $('#slotsWrap');
+  const bw = box.clientWidth, bh = box.clientHeight;
+  if (!bw || !bh) return;
+  const order = S.targets.length ? S.targets : [null];
+  // Display reels in prize order (1º first); they stop in priority order.
+  const display = [...order].sort((a, b) => (a ? a.pos : 0) - (b ? b.pos : 0));
+  const P = display.length;
+  const m = Math.min(bw, bh);
+  const pad = clamp(m * 0.028, 8, 30), gap = pad * 0.7, top = clamp(m * 0.045, 14, 44);
+  let best = null;
+  for (let cols = 1; cols <= P; cols++) {
+    const rowsN = Math.ceil(P / cols);
+    let rw = (bw - 2 * pad - 6 - (cols - 1) * gap) / cols;
+    rw = Math.min(rw, P === 1 ? Math.min(760, bw * 0.92) : 560);
+    const rh = (bh - 2 * pad - 6 - top - gap - (rowsN - 1) * gap) / rowsN;
+    const head = clamp(rh * 0.15, 20, 58);
+    for (const v of [7, 5, 3]) {
+      const ch = (rh - head - 4) / v;
+      if (ch < 20) continue;
+      const f = Math.min(ch / 2.55, rw / (13 * 0.62), 58);
+      if (f < 9) continue;
+      const score = f * (1 + 0.06 * v);
+      if (!best || score > best.score) best = { cols, rowsN, rw, head, v, ch, f, score };
+    }
+  }
+  if (!best) best = { cols: P, rowsN: 1, rw: Math.max(60, (bw - 2 * pad) / P - gap), head: 20, v: 3, ch: 20, f: 9 };
+  R.v = best.v; R.mid = (best.v - 1) / 2; R.ch = best.ch;
+  const reelsW = best.cols * best.rw + (best.cols - 1) * gap;
+  const bulbs = clamp(Math.round((reelsW + 2 * pad) / (top * 1.25)), 8, 44);
+  wrap.innerHTML = `<div class="machine" id="machine" style="--pad:${pad}px;--gap:${gap}px;--top:${top}px;--bulb:${top * 0.42}px">
+    <div class="marquee">${'<i></i>'.repeat(bulbs)}</div>
+    <div class="reels" style="width:${reelsW + 1}px;--rw:${best.rw}px;--head:${best.head}px;--ch:${best.ch}px;--v:${best.v};--mid:${R.mid};--f:${best.f}px">
+      ${display.map(slot => {
+        const c = slot ? slot.color : cfg.theme.accent;
+        return `<div class="reel" style="--c:${c};--ci:${ink(c)}">
+          <div class="reel-head">${slot ? `<b>${slot.pos}º</b><span>${esc(slot.label)}</span>` : '—'}</div>
+          <div class="reel-win"><div class="strip">${'<div class="cell"><span></span></div>'.repeat(best.v + 2)}</div><div class="payline"></div></div>
+        </div>`;
+      }).join('')}
+    </div></div>`;
+  const els = $$('.reel', wrap);
+  R.reels = display.map((slot, i) => {
+    const seq = shuffled(S.names);
+    const el = els[i];
+    return {
+      slot, el, strip: $('.strip', el), cells: $$('.cell', el), seq, ov: new Map(),
+      pos: rand() * Math.max(1, seq.length), speed: 0.45 + rand() * 0.5,
+      lastBase: null, blur: '', state: 'idle', rank: slot ? order.indexOf(slot) : 0,
+    };
   });
-  S.highlight = wins.map(w => w.idx);
+  R.done = true;
+  R.reels.forEach(renderReel);
+}
+function itemAt(r, i) {
+  if (r.ov.has(i)) return r.ov.get(i);
+  const n = r.seq.length;
+  return n ? r.seq[mod(i, n)] : '—';
+}
+function renderReel(r) {
+  const base = Math.floor(r.pos), frac = r.pos - base;
+  if (base !== r.lastBase) {
+    r.lastBase = base;
+    for (let j = 0; j < r.cells.length; j++) {
+      const c = r.cells[j];
+      c.firstChild.textContent = itemAt(r, base + R.mid + 1 - j);
+      c.classList.remove('win');
+    }
+  }
+  r.strip.style.transform = `translate3d(0,${(frac - 1) * R.ch}px,0)`;
+}
+// Names move downward, landing the winner on the middle payline.
+const easeOutReel = p => 1 - Math.pow(1 - p, 2.6);
+function spinSlots() {
+  const reels = R.reels.filter(r => r.slot);
+  const picked = [], seen = new Set();
+  for (const n of shuffled(S.names)) {
+    const k = norm(n); if (seen.has(k)) continue;
+    seen.add(k); picked.push(n);
+    if (picked.length === reels.length) break;
+  }
+  const D = cfg.spinSeconds * 1000, P = reels.length, now = performance.now();
+  reels.sort((a, b) => a.rank - b.rank).forEach((r, k) => {
+    r.winner = picked[k];
+    r.dur = P > 1 ? D * 0.5 + D * 0.5 * (k / (P - 1)) : D;
+    const dist = Math.round(11 * r.dur / 1000) + 6;
+    r.from = r.pos; r.end = Math.ceil(r.pos) + dist;
+    r.ov = new Map([[r.end, r.winner]]);
+    // Avoid showing the winner's name again right next to the payline.
+    [r.end - 1, r.end + 1, r.end - 2, r.end + 2].forEach(i => {
+      if (norm(itemAt(r, i)) === norm(r.winner) && S.names.length > 1) {
+        let alt; do { alt = S.names[randInt(S.names.length)]; } while (norm(alt) === norm(r.winner));
+        r.ov.set(i, alt);
+      }
+    });
+    r.t0 = now; r.state = 'spin'; r.marked = false; r.lastBase = null;
+    r.el.classList.remove('hit');
+  });
+  R.tickReel = reels[reels.length - 1];
+  R.done = false;
+  $('#machine')?.classList.add('spinning');
+  $('#machine')?.classList.remove('celebrate');
+}
+function slotsStep(t, dt) {
+  if (!R.reels.length) return;
+  let busy = false;
+  for (const r of R.reels) {
+    let vel = 0;
+    if (r.state === 'idle') {
+      if (!reducedMotion && !S.spinning && !modalOpen) r.pos += r.speed * dt;
+    } else if (r.state === 'spin') {
+      busy = true;
+      const p = (t - r.t0) / r.dur;
+      if (p >= 1) {
+        r.state = 'stopped'; r.stopT = t; r.pos = r.end;
+        r.el.classList.add('hit'); Sound.clunk();
+      } else {
+        const prev = r.pos;
+        r.pos = r.from + (r.end - r.from) * easeOutReel(p);
+        vel = dt > 0 ? (r.pos - prev) / dt : 0;
+      }
+    }
+    if (r.state === 'stopped') {
+      const d = t - r.stopT;
+      if (d < 520) { busy = true; r.pos = r.end + 0.22 * Math.exp(-d / 110) * Math.sin(d / 42); }
+      else {
+        r.pos = r.end;
+        if (!r.marked) { r.marked = true; renderReel(r); r.cells[R.mid + 1]?.classList.add('win'); }
+      }
+    }
+    const blur = vel > 7 ? `blur(${Math.min(3.5, (vel - 7) / 9).toFixed(1)}px)` : '';
+    if (blur !== r.blur) { r.blur = blur; r.strip.style.filter = blur; }
+    const before = r.lastBase;
+    renderReel(r);
+    if (S.spinning && r === R.tickReel && r.state === 'spin' && before !== r.lastBase) Sound.tick();
+  }
+  if (S.spinning && !R.done && !busy) {
+    R.done = true;
+    $('#machine')?.classList.remove('spinning');
+    $('#machine')?.classList.add('celebrate');
+    finishSpin(R.reels.filter(r => r.slot && r.winner).map(r => ({ slot: r.slot, name: r.winner })));
+  }
+}
+
+/* ================= spin flow ================= */
+function spin() {
+  if (S.spinning) return;
+  if (modalOpen) closeModal();
+  if (S.needsRebuild) buildDraw();
+  Sound.unlock();
+  if (!S.names.length) { toast('Adicione participantes para sortear.'); openDrawer('names'); return; }
+  if (!S.targets.length) {
+    toast(getSlots().length ? 'Todos os prêmios já foram sorteados! 🎉' : 'Cadastre ao menos um prêmio.');
+    if (!getSlots().length) openDrawer('prizes');
+    return;
+  }
+  S.highlight = [];
+  if (cfg.drawType === 'slots') spinSlots(); else spinWheel();
+  S.spinning = true;
+  updateSpinBtn(); updateNow(); renderResults();
+  Sound.whoosh(); Sound.duck(true);
+}
+function finishSpin(wins) {
+  S.spinning = false;
+  wins.forEach(w => { cfg.results[w.slot.key] = { winner: w.name, at: Date.now() }; });
   S.celebrating = performance.now() + 4000;
   save();
   Sound.duck(false);
   Sound.fanfare();
   if (cfg.confetti) Confetti.burst(wins.length > 1 ? 260 : 180);
   updateSpinBtn();
-  setTimeout(() => { renderResults(wins.map(w => w.slot.key)); showWinners(wins); }, 650);
+  setTimeout(() => { renderResults(wins.map(w => w.slot.key)); showWinners(wins); }, cfg.drawType === 'slots' ? 900 : 650);
 }
-
 function updateSpinBtn() {
-  const b = $('#btnSpin');
   const done = getSlots().length > 0 && pendingSlots().length === 0;
-  b.disabled = S.spinning || done;
-  b.textContent = S.spinning ? 'GIRANDO…' : done ? 'CONCLUÍDO 🎉' : 'GIRAR!';
+  const b = $('#btnSpin'), mini = $('#tbSpin');
+  const verb = cfg.drawType === 'slots' ? 'SORTEAR!' : 'GIRAR!';
+  b.disabled = mini.disabled = S.spinning || done;
+  b.textContent = S.spinning ? 'SORTEANDO…' : done ? 'CONCLUÍDO 🎉' : verb;
+  mini.textContent = S.spinning ? '… Sorteando' : done ? '✓ Concluído' : '▶ Sortear';
 }
 function updateNow() {
   const el = $('#now'), txt = $('#nowText');
   const pend = pendingSlots(), total = getSlots().length;
+  const n = S.names.length;
   if (!total) { el.style.setProperty('--dc', cfg.theme.accent); txt.textContent = 'Cadastre os prêmios em Personalizar'; return; }
   if (!pend.length) { el.style.setProperty('--dc', cfg.theme.accent); txt.textContent = 'Sorteio concluído! Parabéns aos ganhadores 🎉'; return; }
-  const n = S.names.length;
-  if (cfg.mode === 'single' || S.pointers.length < 2) {
-    const s = pend[0];
-    el.style.setProperty('--dc', s.color);
-    txt.textContent = `${S.spinning ? 'Sorteando' : 'Próximo'}: ${s.pos}º prêmio · ${s.name} · ${n} na roleta`;
-  } else {
+  if (S.targets.length > 1) {
     el.style.setProperty('--dc', cfg.theme.accent);
-    txt.textContent = `${S.pointers.length} prêmios em um giro · ${n} participantes`;
+    txt.textContent = `${S.targets.length} prêmios em um giro · ${n} participantes`;
+  } else {
+    const s = S.targets[0] || pend[0];
+    el.style.setProperty('--dc', s.color);
+    txt.textContent = `${S.spinning ? 'Sorteando' : 'Próximo'}: ${s.pos}º prêmio · ${s.name} · ${n} participantes`;
   }
 }
 
-/* ================= results panel ================= */
+/* ================= prize panel ================= */
 function renderResults(fresh = []) {
-  const slots = getSlots(), list = $('#slotList');
-  const next = new Set(S.spinning ? [] : S.pointers.filter(p => p.slot).map(p => p.slot.key));
+  const slots = getSlots(), list = $('#prizeList');
+  const next = new Set(S.spinning ? [] : S.targets.map(s => s.key));
   const done = slots.filter(s => cfg.results[s.key]).length;
   $('#progress').textContent = `${done}/${slots.length}`;
   $('#progressBar').style.width = slots.length ? (done / slots.length * 100) + '%' : '0';
@@ -957,17 +1320,32 @@ function renderResults(fresh = []) {
   list.innerHTML = slots.map(s => {
     const r = cfg.results[s.key];
     const cls = r ? 'done' + (fresh.includes(s.key) ? ' fresh' : '') : 'pending' + (next.has(s.key) ? ' next' : '');
-    return `<li class="slot ${cls}" style="--c:${s.color};--ci:${ink(s.color)}">
-      <span class="slot-n">${s.pos}º</span>
-      <div class="slot-body"><div class="slot-prize">${esc(s.name)}</div>
-      <div class="slot-winner">${r ? esc(r.winner) : 'aguardando sorteio…'}</div></div>
+    return `<li class="pitem ${cls}" style="--c:${s.color};--ci:${ink(s.color)}">
+      <span class="pn">${s.pos}º</span>
+      <div class="pbody"><div class="pprize">${esc(s.name)}</div>
+      <div class="pwinner">${r ? esc(r.winner) : 'aguardando…'}</div></div>
       ${r ? `<button class="redo" data-redo="${esc(s.key)}" title="Ganhador ausente? Sortear este prêmio de novo" aria-label="Sortear novamente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></button>` : ''}
     </li>`;
   }).join('');
+  fitList();
   const f = list.querySelector('.fresh') || list.querySelector('.next');
-  if (f) f.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (f) {
+    // Scroll only inside the list so the page (and a recording) never jumps.
+    const lr = list.getBoundingClientRect(), fr = f.getBoundingClientRect();
+    if (fr.top < lr.top || fr.bottom > lr.bottom) list.scrollTop += (fr.top - lr.top) / S.scale - 8;
+  }
 }
-
+// In video formats every prize must stay visible: shrink the list until it fits.
+function fitList() {
+  const list = $('#prizeList');
+  list.style.fontSize = '';
+  if (cfg.format === 'free') return;
+  const base = cfg.format === 'story' ? 0.78 : 1;
+  for (let f = 1; list.scrollHeight > list.clientHeight + 1 && f > 0.5; ) {
+    f -= 0.05;
+    list.style.fontSize = (base * f).toFixed(3) + 'em';
+  }
+}
 function redoSlot(key, auto) {
   const r = cfg.results[key];
   if (!r) return;
@@ -975,12 +1353,11 @@ function redoSlot(key, auto) {
   delete cfg.results[key];
   save();
   S.highlight = [];
-  if (modalOpen) closeModal(); else buildWheel();
+  if (modalOpen) closeModal(); else buildDraw();
   renderResults();
   toast(`${r.winner} marcado(a) como ausente. Prêmio liberado.`);
   if (auto) setTimeout(spin, 450);
 }
-
 function resultText() {
   const lines = [`🏆 ${cfg.title || 'Sorteio'}`, ''];
   getSlots().forEach(s => { const r = cfg.results[s.key]; lines.push(`${s.pos}º ${s.name} — ${r ? r.winner : '(pendente)'}`); });
@@ -988,13 +1365,13 @@ function resultText() {
 }
 
 /* ================= modal ================= */
-let modalOpen = false;
 function showWinners(wins) {
   if (!wins.length) return;
   const card = $('#card');
   const remaining = pendingSlots().length;
+  const again = cfg.mode === 'single' ? 'Próximo prêmio' : 'Sortear restantes';
   const nextBtn = remaining
-    ? `<button class="cbtn main" data-act="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${cfg.mode === 'single' ? 'Próximo prêmio' : 'Girar de novo'}</button>`
+    ? `<button class="cbtn main" data-act="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${again}</button>`
     : `<button class="cbtn main" data-act="close">Ver resultado final</button>`;
   if (wins.length === 1) {
     const w = wins[0];
@@ -1009,29 +1386,29 @@ function showWinners(wins) {
       </div>`;
   } else {
     const ordered = [...wins].sort((a, b) => a.slot.pos - b.slot.pos);
+    const two = cfg.format === 'wide' && ordered.length > 5;
     card.innerHTML = `<div class="rays"></div>
       <div class="trophy">🎉</div>
       <h3>TEMOS ${wins.length} GANHADORES!</h3>
-      <ul class="win-list">${ordered.map((w, i) => `
+      <ul class="win-list${two ? ' two' : ''}">${ordered.map((w, i) => `
         <li style="animation-delay:${0.25 + i * 0.22}s;--c:${w.slot.color};--ci:${ink(w.slot.color)}">
-          <span class="slot-n">${w.slot.pos}º</span>
+          <span class="pn">${w.slot.pos}º</span>
           <div><div class="w">${esc(w.name)}</div><div class="p">${esc(w.slot.name)}</div></div>
         </li>`).join('')}</ul>
-      ${remaining ? `<p class="note">Ainda restam ${remaining} prêmio(s) — faltaram participantes na roleta.</p>` : ''}
-      <div class="card-actions">${remaining ? nextBtn : '<button class="cbtn main" data-act="close">Fechar</button>'}</div>
-      <p class="note" style="margin:14px 0 0">Alguém ausente? Use o botão ↻ ao lado do nome na lista de prêmios.</p>`;
+      ${remaining ? `<p class="note">Ainda restam ${remaining} prêmio(s) para sortear.</p>` : ''}
+      <div class="card-actions">${remaining ? nextBtn : '<button class="cbtn main" data-act="close">Fechar</button>'}</div>`;
     ordered.forEach((w, i) => setTimeout(() => Sound.pop(i), 250 + i * 220));
   }
   modalOpen = true;
   $('#modal').classList.add('show');
-  setTimeout(() => card.querySelector('.cbtn.main')?.focus(), 50);
+  setTimeout(() => card.querySelector('.cbtn.main')?.focus({ preventScroll: true }), 50);
 }
 function closeModal() {
   if (!modalOpen) return;
   modalOpen = false;
   $('#modal').classList.remove('show');
   S.highlight = [];
-  buildWheel();
+  buildDraw();
   renderResults();
 }
 $('#modal').addEventListener('click', e => {
@@ -1047,20 +1424,25 @@ $('#modal').addEventListener('click', e => {
 /* ================= confetti ================= */
 const Confetti = (() => {
   const c = $('#confetti'), g = c.getContext('2d');
-  let parts = [], running = false;
-  function size() { const d = Math.min(2, devicePixelRatio || 1); c.width = innerWidth * d; c.height = innerHeight * d; g.setTransform(d, 0, 0, d, 0, 0); }
-  addEventListener('resize', size); size();
+  let parts = [], running = false, w = 0, h = 0, k = 1;
+  function resize() {
+    w = c.clientWidth || innerWidth; h = c.clientHeight || innerHeight;
+    const d = clamp((window.devicePixelRatio || 1) * S.scale, 0.75, 2);
+    c.width = Math.round(w * d); c.height = Math.round(h * d); g.setTransform(d, 0, 0, d, 0, 0);
+    k = cfg.format === 'free' ? 1 : h / 900;
+  }
+  addEventListener('resize', resize);
   function burst(n) {
+    if (!w) resize();
     const cols = [...cfg.theme.palette, cfg.theme.accent, '#ffffff'];
-    const w = innerWidth, h = innerHeight;
     for (let i = 0; i < n; i++) {
       const fromSide = i % 2 ? 1 : -1, side = i < n * 0.6;
       parts.push({
         x: side ? (fromSide < 0 ? -10 : w + 10) : Math.random() * w,
         y: side ? h * (0.55 + Math.random() * 0.3) : -20 - Math.random() * h * 0.4,
-        vx: side ? -fromSide * (6 + Math.random() * 10) : (Math.random() - 0.5) * 3,
-        vy: side ? -(10 + Math.random() * 12) : 2 + Math.random() * 3,
-        r: 4 + Math.random() * 6, rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 0.4,
+        vx: (side ? -fromSide * (6 + Math.random() * 10) : (Math.random() - 0.5) * 3) * k,
+        vy: (side ? -(10 + Math.random() * 12) : 2 + Math.random() * 3) * k,
+        r: (4 + Math.random() * 6) * k, rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 0.4,
         color: cols[Math.floor(Math.random() * cols.length)], shape: Math.random() < 0.65 ? 0 : Math.random() < 0.5 ? 1 : 2,
         life: 0, tilt: Math.random() * TAU,
       });
@@ -1068,20 +1450,20 @@ const Confetti = (() => {
     if (!running) { running = true; requestAnimationFrame(loop); }
   }
   function loop() {
-    g.clearRect(0, 0, innerWidth, innerHeight);
-    parts = parts.filter(p => p.y < innerHeight + 40 && p.life < 600);
+    g.clearRect(0, 0, w, h);
+    parts = parts.filter(p => p.y < h + 40 * k && p.life < 600);
     for (const p of parts) {
-      p.life++; p.vy += 0.28; p.vx *= 0.985; p.vy = Math.min(p.vy, 6 + p.r * 0.3);
-      p.x += p.vx + Math.sin(p.life / 12 + p.tilt) * 0.6; p.y += p.vy; p.rot += p.vr;
+      p.life++; p.vy += 0.28 * k; p.vx *= 0.985; p.vy = Math.min(p.vy, (6 + p.r * 0.3) * k);
+      p.x += p.vx + Math.sin(p.life / 12 + p.tilt) * 0.6 * k; p.y += p.vy; p.rot += p.vr;
       g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
       if (p.shape === 0) { g.scale(1, Math.abs(Math.cos(p.life / 8 + p.tilt))); g.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r); }
       else if (p.shape === 1) { g.beginPath(); g.arc(0, 0, p.r * 0.6, 0, TAU); g.fill(); }
       else { g.beginPath(); for (let i = 0; i < 5; i++) { const a = i * TAU / 5 - Math.PI / 2; g.lineTo(Math.cos(a) * p.r, Math.sin(a) * p.r); g.lineTo(Math.cos(a + TAU / 10) * p.r * 0.45, Math.sin(a + TAU / 10) * p.r * 0.45); } g.fill(); }
       g.restore();
     }
-    if (parts.length) requestAnimationFrame(loop); else { running = false; g.clearRect(0, 0, innerWidth, innerHeight); }
+    if (parts.length) requestAnimationFrame(loop); else { running = false; g.clearRect(0, 0, w, h); }
   }
-  return { burst };
+  return { burst, resize };
 })();
 
 /* ================= storage for big files (music) ================= */
@@ -1108,8 +1490,9 @@ const idb = {
 
 /* ================= sound ================= */
 const Sound = (() => {
-  let ac = null, master, musicBus, sfxBus, noiseBuf, timer = null, step = 0, nextTime = 0, playing = false, ducked = false;
-  let fileAudio = null, fileUrl = null;
+  let ac = null, master, musicBus, fileBus, sfxBus, noiseBuf, recDest = null, timer = null, step = 0, nextTime = 0, playing = false, ducked = false;
+  let fileAudio = null, fileUrl = null, fileNode = null;
+  let lastTick = 0;
   const STEP = 60 / 124 / 4;
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   // C – G – Am – F
@@ -1133,10 +1516,11 @@ const Sound = (() => {
       ac = new AC();
       master = ac.createGain(); master.connect(ac.destination);
       musicBus = ac.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
+      fileBus = ac.createGain(); fileBus.connect(master);
       sfxBus = ac.createGain(); sfxBus.connect(master);
       noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
       const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      setVolume(cfg.sound.volume);
+      master.gain.value = cfg.sound.volume;
     }
     if (ac.state === 'suspended') ac.resume();
     return ac;
@@ -1178,7 +1562,7 @@ const Sound = (() => {
   }
   function setVolume(v) {
     if (master) master.gain.setTargetAtTime(v, ac.currentTime, 0.05);
-    if (fileAudio) fileAudio.volume = clamp(v * (ducked ? 0.35 : 1), 0, 1);
+    else if (fileAudio) fileAudio.volume = clamp(v, 0, 1);
   }
   async function loadFile() {
     try {
@@ -1188,7 +1572,9 @@ const Sound = (() => {
       fileUrl = URL.createObjectURL(blob);
       if (!fileAudio) { fileAudio = new Audio(); fileAudio.loop = true; }
       fileAudio.src = fileUrl;
-      fileAudio.volume = cfg.sound.volume;
+      // Route through Web Audio so ducking, volume and video recording include it.
+      if (!fileNode && ensure()) { try { fileNode = ac.createMediaElementSource(fileAudio); fileNode.connect(fileBus); } catch (e) { fileNode = null; } }
+      if (!fileNode) fileAudio.volume = cfg.sound.volume;
       return fileAudio;
     } catch (e) { return null; }
   }
@@ -1197,9 +1583,9 @@ const Sound = (() => {
     playing = true;
     if (cfg.sound.source === 'file') {
       const a = fileAudio && fileAudio.src ? fileAudio : await loadFile();
-      if (a) { try { await a.play(); return true; } catch (e) { playing = false; return false; } }
+      if (a) { try { ensure(); await a.play(); return true; } catch (e) { playing = false; return false; } }
     }
-    if (!ensure()) return false;
+    if (!ensure()) { playing = false; return false; }
     if (ac.state !== 'running') { try { await ac.resume(); } catch (e) {} }
     if (ac.state !== 'running') { playing = false; return false; }
     step = 0; nextTime = ac.currentTime + 0.06;
@@ -1212,22 +1598,33 @@ const Sound = (() => {
     if (fileAudio) fileAudio.pause();
   }
   return {
-    unlock() { ensure(); if (cfg.sound.music && !playing) startMusic().then(ok => { if (!ok) cfg.sound.music && updateSoundBtns(); }); },
+    unlock() { ensure(); if (cfg.sound.music && !playing) startMusic().then(updateSoundBtns); },
     startMusic, stopMusic, setVolume, loadFile,
     get playing() { return playing; },
+    streamDest() {
+      if (!ensure()) return null;
+      if (!recDest) { recDest = ac.createMediaStreamDestination(); master.connect(recDest); }
+      return recDest;
+    },
     duck(on) {
       ducked = on;
-      if (musicBus) musicBus.gain.setTargetAtTime(on ? 0.22 : 0.55, ac.currentTime, 0.3);
-      if (fileAudio) fileAudio.volume = clamp(cfg.sound.volume * (on ? 0.35 : 1), 0, 1);
+      if (musicBus) { musicBus.gain.setTargetAtTime(on ? 0.22 : 0.55, ac.currentTime, 0.3); fileBus.gain.setTargetAtTime(on ? 0.35 : 1, ac.currentTime, 0.3); }
+      else if (fileAudio) fileAudio.volume = clamp(cfg.sound.volume * (on ? 0.35 : 1), 0, 1);
     },
     tick() {
       if (!cfg.sound.sfx || !ensure()) return;
-      const now = performance.now(); if (now - this._lt < 28) return; this._lt = now;
+      const now = performance.now(); if (now - lastTick < 28) return; lastTick = now;
       const t = ac.currentTime;
       tone(1700 + Math.random() * 300, t, 0.03, 'square', 0.07, sfxBus, 4000);
       noise(t, 0.02, 0.08, sfxBus, 'highpass', 3000);
     },
-    _lt: 0,
+    clunk() {
+      if (!cfg.sound.sfx || !ensure()) return;
+      const t = ac.currentTime;
+      tone(140, t, 0.16, 'sine', 0.35, sfxBus);
+      tone(880, t, 0.08, 'triangle', 0.06, sfxBus);
+      noise(t, 0.08, 0.18, sfxBus, 'lowpass', 900);
+    },
     whoosh() {
       if (!cfg.sound.sfx || !ensure()) return;
       const t = ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
@@ -1242,7 +1639,6 @@ const Sound = (() => {
       [72, 76, 79, 84].forEach((n, i) => { tone(mtof(n), t + i * 0.11, 0.22, 'sawtooth', 0.09, sfxBus, 2800); tone(mtof(n), t + i * 0.11, 0.25, 'triangle', 0.06, sfxBus); });
       [72, 76, 79, 84, 88].forEach(n => { tone(mtof(n), t + 0.5, 1.5, 'sawtooth', 0.045, sfxBus, 2600); tone(mtof(n - 12), t + 0.5, 1.5, 'triangle', 0.05, sfxBus); });
       for (let i = 0; i < 14; i++) tone(mtof(84 + [0, 4, 7, 12][i % 4] + 12), t + 0.6 + i * 0.07, 0.18, 'triangle', 0.025, sfxBus);
-      // crowd / applause
       const g = noise(t + 0.45, 2.6, 0.0001, sfxBus, 'bandpass', 1400, 0.6);
       g.gain.cancelScheduledValues(t);
       g.gain.setValueAtTime(0.0001, t + 0.45); g.gain.exponentialRampToValueAtTime(0.16, t + 0.9); g.gain.exponentialRampToValueAtTime(0.0001, t + 3);
@@ -1250,8 +1646,7 @@ const Sound = (() => {
     },
     pop(i) {
       if (!cfg.sound.sfx || !ensure()) return;
-      const t = ac.currentTime;
-      tone(mtof(76 + (i % 5) * 2), t, 0.14, 'triangle', 0.08, sfxBus);
+      tone(mtof(76 + (i % 5) * 2), ac.currentTime, 0.14, 'triangle', 0.08, sfxBus);
     },
   };
 })();
@@ -1278,15 +1673,78 @@ async function setMusic(on) {
   updateSoundBtns();
 }
 
+/* ================= video recording (records only the frame) ================= */
+const Rec = { rec: null, chunks: [], t0: 0, timer: 0 };
+function updateRecBtn() {
+  const b = $('#btnRec'), live = !!Rec.rec;
+  b.classList.toggle('live', live);
+  if (live) {
+    const s = Math.floor((Date.now() - Rec.t0) / 1000);
+    b.textContent = `■ ${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    $('#btnRec2').textContent = '■ Parar e baixar vídeo';
+  } else {
+    b.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="#ff4d6d"/></svg><span>Gravar</span>';
+    $('#btnRec2').textContent = '● Gravar vídeo';
+  }
+}
+async function toggleRec() {
+  if (Rec.rec) { if (Rec.rec.state !== 'inactive') Rec.rec.stop(); return; }
+  if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder) {
+    toast('Gravação indisponível aqui. Use Chrome/Edge no computador ou o gravador de tela do sistema.');
+    return;
+  }
+  closeDrawer();
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: { ideal: 60 }, displaySurface: 'browser' }, audio: false,
+      preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude',
+    });
+  } catch (e) { toast('Gravação cancelada.'); return; }
+  const [track] = stream.getVideoTracks();
+  try {
+    if (window.CropTarget && track.cropTo) await track.cropTo(await CropTarget.fromElement(frame));
+    else if (cfg.format !== 'free') toast('Recorte automático indisponível neste navegador: a aba inteira será gravada.');
+  } catch (e) { toast('Não foi possível recortar o quadro; a aba inteira será gravada.'); }
+  const dest = Sound.streamDest();
+  if (dest) dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+  // MP4 only with H.264 (what Instagram/TikTok accept); otherwise WebM.
+  const types = ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+  let rec;
+  try { rec = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 16e6 } : {}); }
+  catch (e) { stream.getVideoTracks().forEach(t => t.stop()); toast('Não foi possível iniciar a gravação.'); return; }
+  Rec.chunks = [];
+  rec.ondataavailable = e => { if (e.data && e.data.size) Rec.chunks.push(e.data); };
+  rec.onstop = () => {
+    stream.getVideoTracks().forEach(t => t.stop());
+    const type = rec.mimeType || mimeType || 'video/webm';
+    const ext = type.includes('mp4') ? 'mp4' : 'webm';
+    const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+    if (Rec.chunks.length) download(`sorteio-${stamp}.${ext}`, new Blob(Rec.chunks, { type: type.split(';')[0] }));
+    Rec.rec = null; clearInterval(Rec.timer); updateRecBtn();
+    document.body.classList.remove('recording');
+    toast(ext === 'mp4' ? 'Vídeo salvo 🎬' : 'Vídeo salvo em WebM. Se a rede social não aceitar, converta para MP4.');
+  };
+  track.addEventListener('ended', () => { if (Rec.rec && Rec.rec.state !== 'inactive') Rec.rec.stop(); });
+  $('#toasts').innerHTML = '';
+  document.body.classList.add('recording');
+  rec.start(500);
+  Rec.rec = rec; Rec.t0 = Date.now(); Rec.timer = setInterval(updateRecBtn, 500);
+  updateRecBtn();
+}
+
 /* ================= drawer / forms ================= */
 function openDrawer(tab) {
   if (tab) selectTab(tab);
   $('#drawer').classList.add('show'); $('#scrim').classList.add('show');
   $('#drawer').setAttribute('aria-hidden', 'false');
+  poke();
 }
 function closeDrawer() {
   $('#drawer').classList.remove('show'); $('#scrim').classList.remove('show');
   $('#drawer').setAttribute('aria-hidden', 'true');
+  poke();
 }
 function selectTab(name) {
   $$('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
@@ -1296,9 +1754,12 @@ $$('.tabs button').forEach(b => b.addEventListener('click', () => selectTab(b.da
 $('#btnSettings').addEventListener('click', () => openDrawer());
 $('#btnClose').addEventListener('click', closeDrawer);
 $('#scrim').addEventListener('click', closeDrawer);
-document.addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openDrawer(b.dataset.open); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-open]'); if (b) openDrawer(b.dataset.open);
+  const px = e.target.closest('[data-proxy]'); if (px) document.getElementById(px.dataset.proxy).click();
+});
 
-const refresh = debounce(() => { buildWheel(); renderResults(); }, 220);
+const refresh = debounce(() => { buildDraw(); renderResults(); }, 220);
 
 // --- prizes
 const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>';
@@ -1309,9 +1770,9 @@ function renderPrizeEditor() {
     <div class="prize-row" data-id="${p.id}">
       <input class="inp p-qty" type="number" min="1" max="500" value="${esc(p.qty)}" aria-label="Quantidade" title="Quantidade">
       <input class="inp p-name" type="text" value="${esc(p.name)}" placeholder="Descrição do prêmio" aria-label="Descrição">
-      <input class="p-color" type="color" value="${esc(p.color)}" aria-label="Cor do prêmio" title="Cor do ponteiro">
+      <input class="p-color" type="color" value="${esc(p.color)}" aria-label="Cor do prêmio" title="Cor">
       <button class="mini p-del" title="Remover prêmio" aria-label="Remover">${ICON_DEL}</button>
-      <input class="inp p-label" type="text" value="${esc(p.label)}" maxlength="18" placeholder="Texto no ponteiro (auto: ${esc(shortLabel({ ...p, label: '' }))})" aria-label="Texto no ponteiro">
+      <input class="inp p-label" type="text" value="${esc(p.label)}" maxlength="18" placeholder="Texto curto (auto: ${esc(shortLabel({ ...p, label: '' }))})" aria-label="Texto curto">
       <div class="mv"><button class="mini p-up" ${i === 0 ? 'disabled' : ''} title="Subir">${ICON_UP}</button><button class="mini p-down" ${i === cfg.prizes.length - 1 ? 'disabled' : ''} title="Descer">${ICON_DOWN}</button></div>
     </div>`).join('') || '<p class="help">Nenhum prêmio. Adicione abaixo.</p>';
   updatePrizeCount();
@@ -1324,7 +1785,7 @@ $('#prizeEditor').addEventListener('input', e => {
   const row = e.target.closest('.prize-row'); if (!row) return;
   const p = cfg.prizes.find(x => x.id === row.dataset.id); if (!p) return;
   if (e.target.classList.contains('p-qty')) p.qty = clamp(parseInt(e.target.value, 10) || 0, 0, 500);
-  if (e.target.classList.contains('p-name')) { p.name = e.target.value; row.querySelector('.p-label').placeholder = `Texto no ponteiro (auto: ${shortLabel({ ...p, label: '' })})`; }
+  if (e.target.classList.contains('p-name')) { p.name = e.target.value; row.querySelector('.p-label').placeholder = `Texto curto (auto: ${shortLabel({ ...p, label: '' })})`; }
   if (e.target.classList.contains('p-label')) p.label = e.target.value;
   if (e.target.classList.contains('p-color')) p.color = e.target.value;
   save(); updatePrizeCount(); refresh();
@@ -1369,14 +1830,12 @@ function updateNameCount() {
   const uniq = new Set(names.map(norm)).size;
   $('#nameCount').innerHTML = `<b>${names.length}</b> ${names.length === 1 ? 'nome' : 'nomes'}`;
   $('#dupWarn').textContent = names.length - uniq > 0 ? `⚠️ ${names.length - uniq} nome(s) repetido(s). Repetidos aumentam a chance da pessoa — use "Remover repetidos" se não for intencional.` : '';
+  $('#manyTip').hidden = !(names.length > 80 && cfg.drawType === 'wheel');
+  updateFoot();
 }
 $('#namesInput').addEventListener('input', e => { cfg.namesText = e.target.value; save(); updateNameCount(); refresh(); });
 function setNames(list) { cfg.namesText = list.join('\n'); $('#namesInput').value = cfg.namesText; save(); updateNameCount(); refresh(); }
-$('#btnShuffle').addEventListener('click', () => {
-  const a = parseNames(cfg.namesText);
-  for (let i = a.length - 1; i > 0; i--) { const j = randInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
-  setNames(a); toast('Ordem embaralhada 🔀');
-});
+$('#btnShuffle').addEventListener('click', () => { setNames(shuffled(parseNames(cfg.namesText))); toast('Ordem embaralhada 🔀'); });
 $('#btnDedupe').addEventListener('click', () => {
   const seen = new Set(), a = parseNames(cfg.namesText).filter(n => { const k = norm(n); if (seen.has(k)) return false; seen.add(k); return true; });
   setNames(a); toast('Repetidos removidos.');
@@ -1388,6 +1847,66 @@ $('#namesFile').addEventListener('change', async e => {
   const rows = txt.split(/\r?\n/).map(l => l.split(/[;,\t]/)[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
   setNames(rows); e.target.value = ''; toast(`${rows.length} nomes importados.`);
 });
+$('#btnUseSlots').addEventListener('click', () => setDrawType('slots'));
+
+// --- draw settings
+function setDrawType(type) {
+  cfg.drawType = type; save(); fillDrawInputs(); updateNameCount();
+  S.highlight = [];
+  buildDraw(); renderResults();
+  toast(type === 'slots' ? 'Modo caça-níquel ativado 🎰' : 'Modo roleta ativado 🎡');
+}
+function fillDrawInputs() {
+  $$('[data-type]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.type === cfg.drawType)));
+  $$('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === cfg.mode)));
+  $('#inReverse').checked = cfg.reverseOrder;
+  $('#inRemove').checked = cfg.removeWinners;
+  $('#inDuration').value = cfg.spinSeconds; $('#durVal').textContent = cfg.spinSeconds + 's';
+}
+$$('[data-type]').forEach(b => b.addEventListener('click', () => { if (!S.spinning) setDrawType(b.dataset.type); }));
+$$('[data-mode]').forEach(b => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; save(); fillDrawInputs(); refresh(); }));
+$('#inReverse').addEventListener('change', e => { cfg.reverseOrder = e.target.checked; save(); refresh(); });
+$('#inRemove').addEventListener('change', e => { cfg.removeWinners = e.target.checked; save(); refresh(); });
+$('#inDuration').addEventListener('input', e => { cfg.spinSeconds = +e.target.value; $('#durVal').textContent = cfg.spinSeconds + 's'; save(); });
+$('#btnExport').addEventListener('click', () => {
+  const slug = (cfg.title || 'sorteio').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  download(`sorteio-${slug || 'config'}.json`, JSON.stringify({ ...cfg, results: {}, absent: [] }, null, 2), 'application/json');
+});
+$('#importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || typeof data !== 'object' || !Array.isArray(data.prizes)) throw new Error('formato');
+    cfg = merge(defaults(), data); save(); renderAll(); toast('Configuração importada ✅');
+  } catch (err) { toast('Arquivo inválido.'); }
+  e.target.value = '';
+});
+$('#btnFactory').addEventListener('click', () => {
+  if (!confirm('Restaurar tudo para o padrão? Prêmios, nomes, tema, logo e resultados serão apagados.')) return;
+  Sound.stopMusic(); cfg = defaults(); save(); renderAll(); toast('Configuração restaurada.');
+});
+
+// --- video
+function setFormat(f) {
+  if (S.spinning) return;
+  cfg.format = f; save(); applyFormat();
+}
+function fillVideoInputs() {
+  $('#inGuides').checked = cfg.guides;
+  $('#inSpinInVideo').checked = cfg.spinInVideo;
+  $('#inFooter').checked = cfg.showFooter;
+  $('#inFooterText').value = cfg.footerText || '';
+}
+$$('#fmtSeg button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.fmt)));
+$$('[data-format]').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.format)));
+function setGuides(on) { cfg.guides = on; save(); fillVideoInputs(); applyFormat(); }
+$('#inGuides').addEventListener('change', e => setGuides(e.target.checked));
+$('#btnGuides').addEventListener('click', () => setGuides(!cfg.guides));
+$('#inSpinInVideo').addEventListener('change', e => { cfg.spinInVideo = e.target.checked; save(); applyFormat(); });
+$('#inFooter').addEventListener('change', e => { cfg.showFooter = e.target.checked; save(); applyFormat(); });
+$('#inFooterText').addEventListener('input', e => { cfg.footerText = e.target.value; save(); updateFoot(); });
+$('#btnRec').addEventListener('click', toggleRec);
+$('#btnRec2').addEventListener('click', toggleRec);
 
 // --- appearance
 function renderPresets() {
@@ -1408,13 +1927,14 @@ function fillThemeInputs() {
   renderPaletteEditor();
   $$('.preset').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === cfg.preset)));
 }
-function themeChanged() { cfg.preset = 'custom'; save(); applyTheme(); renderWheelImage(); renderResults(); $$('.preset').forEach(b => b.setAttribute('aria-pressed', 'false')); }
+function repaint() { applyTheme(); renderWheelImage(); if (cfg.drawType === 'slots') relayout(); renderResults(); updateSpinBtn(); }
+function themeChanged() { cfg.preset = 'custom'; save(); repaint(); $$('.preset').forEach(b => b.setAttribute('aria-pressed', 'false')); }
 $('#presets').addEventListener('click', e => {
   const b = e.target.closest('.preset'); if (!b) return;
   const p = PRESETS[b.dataset.preset];
   cfg.preset = b.dataset.preset;
   cfg.theme = { bg1: p.bg1, bg2: p.bg2, accent: p.accent, text: p.text, palette: [...p.palette] };
-  save(); applyTheme(); fillThemeInputs(); renderWheelImage(); renderResults();
+  save(); fillThemeInputs(); repaint();
 });
 [['#cBg1', 'bg1'], ['#cBg2', 'bg2'], ['#cAccent', 'accent'], ['#cText', 'text']].forEach(([sel, key]) =>
   $(sel).addEventListener('input', e => { cfg.theme[key] = e.target.value; themeChanged(); }));
@@ -1425,8 +1945,8 @@ $('#paletteEditor').addEventListener('click', e => {
   else return;
   renderPaletteEditor(); themeChanged();
 });
-$('#inTitle').addEventListener('input', e => { cfg.title = e.target.value; save(); renderHeader(); });
-$('#inSubtitle').addEventListener('input', e => { cfg.subtitle = e.target.value; save(); renderHeader(); });
+$('#inTitle').addEventListener('input', e => { cfg.title = e.target.value; save(); renderHeader(); refresh(); });
+$('#inSubtitle').addEventListener('input', e => { cfg.subtitle = e.target.value; save(); renderHeader(); refresh(); });
 $('#inHubLogo').addEventListener('change', e => { cfg.hubLogo = e.target.checked; save(); });
 $('#inConfetti').addEventListener('change', e => { cfg.confetti = e.target.checked; save(); if (cfg.confetti) Confetti.burst(80); });
 $('#logoFile').addEventListener('change', e => {
@@ -1436,48 +1956,19 @@ $('#logoFile').addEventListener('change', e => {
     const im = new Image();
     im.onload = () => {
       // Shrink large logos so they fit comfortably in localStorage.
-      const max = 512, sc = Math.min(1, max / Math.max(im.width, im.height));
+      const max = 640, sc = Math.min(1, max / Math.max(im.width, im.height));
       const c = document.createElement('canvas');
       c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
       c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
       cfg.logo = f.type === 'image/svg+xml' && rd.result.length < 200000 ? rd.result : c.toDataURL('image/png');
-      save(); renderHeader(); toast('Logo atualizada ✨');
+      save(); renderHeader(); refresh(); toast('Logo atualizada ✨');
     };
     im.onerror = () => toast('Não foi possível ler esta imagem.');
     im.src = rd.result;
   };
   rd.readAsDataURL(f); e.target.value = '';
 });
-$('#btnLogoRemove').addEventListener('click', () => { cfg.logo = ''; save(); renderHeader(); });
-
-// --- draw settings
-function fillDrawInputs() {
-  $$('.mode').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === cfg.mode)));
-  $('#inReverse').checked = cfg.reverseOrder;
-  $('#inRemove').checked = cfg.removeWinners;
-  $('#inDuration').value = cfg.spinSeconds; $('#durVal').textContent = cfg.spinSeconds + 's';
-}
-$$('.mode').forEach(b => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; save(); fillDrawInputs(); refresh(); }));
-$('#inReverse').addEventListener('change', e => { cfg.reverseOrder = e.target.checked; save(); refresh(); });
-$('#inRemove').addEventListener('change', e => { cfg.removeWinners = e.target.checked; save(); refresh(); });
-$('#inDuration').addEventListener('input', e => { cfg.spinSeconds = +e.target.value; $('#durVal').textContent = cfg.spinSeconds + 's'; save(); });
-$('#btnExport').addEventListener('click', () => {
-  const slug = (cfg.title || 'sorteio').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  download(`roleta-${slug || 'config'}.json`, JSON.stringify({ ...cfg, results: {}, absent: [] }, null, 2), 'application/json');
-});
-$('#importFile').addEventListener('change', async e => {
-  const f = e.target.files[0]; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text());
-    if (!data || typeof data !== 'object' || !Array.isArray(data.prizes)) throw new Error('formato');
-    cfg = merge(defaults(), data); save(); renderAll(); toast('Configuração importada ✅');
-  } catch (err) { toast('Arquivo inválido.'); }
-  e.target.value = '';
-});
-$('#btnFactory').addEventListener('click', () => {
-  if (!confirm('Restaurar tudo para o padrão? Prêmios, nomes, tema, logo e resultados serão apagados.')) return;
-  Sound.stopMusic(); cfg = defaults(); save(); renderAll(); toast('Configuração restaurada.');
-});
+$('#btnLogoRemove').addEventListener('click', () => { cfg.logo = ''; save(); renderHeader(); refresh(); });
 
 // --- sound
 function fillSoundInputs() {
@@ -1511,12 +2002,14 @@ $('#btnMusicRemove').addEventListener('click', async () => {
 
 /* ================= main actions ================= */
 $('#btnSpin').addEventListener('click', spin);
+$('#tbSpin').addEventListener('click', spin);
 canvas.addEventListener('click', e => {
   const r = canvas.getBoundingClientRect();
-  const x = (e.clientX - r.left) * L.dpr - L.c, y = (e.clientY - r.top) * L.dpr - L.c;
+  const x = (e.clientX - r.left) * (canvas.width / r.width) - L.c, y = (e.clientY - r.top) * (canvas.height / r.height) - L.c;
   if (Math.hypot(x, y) < L.Rw * 0.2) spin();
 });
-$('#slotList').addEventListener('click', e => {
+$('#slotsWrap').addEventListener('click', e => { if (e.target.closest('.machine') && !S.spinning) spin(); });
+$('#prizeList').addEventListener('click', e => {
   const b = e.target.closest('[data-redo]'); if (!b || S.spinning) return;
   const r = cfg.results[b.dataset.redo];
   if (r && confirm(`Marcar "${r.winner}" como ausente e sortear este prêmio novamente?`)) redoSlot(b.dataset.redo, false);
@@ -1535,14 +2028,13 @@ $('#btnCsv').addEventListener('click', () => {
 $('#btnReset').addEventListener('click', () => {
   if (!Object.keys(cfg.results).length && !cfg.absent.length) return toast('Nada para limpar — o sorteio ainda não começou.');
   if (!confirm('Começar um novo sorteio? Os ganhadores atuais serão apagados (prêmios e nomes continuam).')) return;
-  cfg.results = {}; cfg.absent = []; save(); S.highlight = []; closeModal(); buildWheel(); renderResults(); toast('Pronto para um novo sorteio!');
+  cfg.results = {}; cfg.absent = []; save(); S.highlight = []; closeModal(); buildDraw(); renderResults(); toast('Pronto para um novo sorteio!');
 });
 $('#btnFull').addEventListener('click', toggleFull);
 function toggleFull() {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
   else document.exitFullscreen?.();
 }
-document.addEventListener('fullscreenchange', () => document.body.classList.toggle('present', !!document.fullscreenElement));
 
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') || document.activeElement?.isContentEditable;
@@ -1551,31 +2043,46 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Space' || (e.key === 'Enter' && !modalOpen && document.activeElement === document.body)) { e.preventDefault(); spin(); }
   else if (e.key === 'f' || e.key === 'F') toggleFull();
   else if (e.key === 'm' || e.key === 'M') $('#btnMusic').click();
+  else if (e.key === 'g' || e.key === 'G') setGuides(!cfg.guides);
+  else if (e.key === 'r' || e.key === 'R') toggleRec();
 });
 // First interaction unlocks audio (browser autoplay policy) and resumes music if it was on.
-['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { if (cfg.sound.music && !Sound.playing) Sound.unlock(); setTimeout(updateSoundBtns, 200); }, { once: true }));
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { if (cfg.sound.music && !Sound.playing) Sound.unlock(); setTimeout(updateSoundBtns, 250); }, { once: true }));
 
 /* ================= boot ================= */
 function renderAll() {
   applyTheme(); renderHeader();
   $('#inTitle').value = cfg.title; $('#inSubtitle').value = cfg.subtitle;
   $('#inHubLogo').checked = cfg.hubLogo; $('#inConfetti').checked = cfg.confetti;
-  $('#namesInput').value = cfg.namesText; updateNameCount();
-  renderPresets(); fillThemeInputs(); renderPrizeEditor(); fillDrawInputs(); fillSoundInputs();
+  $('#namesInput').value = cfg.namesText;
+  renderPresets(); fillThemeInputs(); renderPrizeEditor(); fillDrawInputs(); fillVideoInputs(); fillSoundInputs(); updateRecBtn();
+  updateNameCount();
+  applyFormat();
   S.highlight = [];
-  buildWheel(); renderResults();
+  buildDraw(); renderResults();
 }
-function frame(t) {
-  if (S.spinning) stepSpin(t);
-  for (let k = 0; k < S.flaps.length; k++) S.flaps[k] *= 0.86;
-  if (L.size) draw(t);
-  requestAnimationFrame(frame);
+let lastT = 0;
+function loop(t) {
+  const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0; lastT = t;
+  if (cfg.drawType === 'slots') slotsStep(t, dt);
+  else {
+    if (S.spinning) stepWheel(t);
+    for (let k = 0; k < W.flaps.length; k++) W.flaps[k] *= 0.86;
+    if (L.size) drawWheel(t);
+  }
+  requestAnimationFrame(loop);
 }
 renderAll();
-new ResizeObserver(debounce(() => layout(), 60)).observe($('#wheelWrap'));
-if (document.fonts) document.fonts.ready.then(() => renderWheelImage());
+new ResizeObserver(debounce(() => { if (S.ready) relayout(); }, 80)).observe(box);
+addEventListener('resize', debounce(fitFrame, 80));
+document.addEventListener('fullscreenchange', () => setTimeout(fitFrame, 60));
+new ResizeObserver(debounce(fitList, 60)).observe($('#prizeList'));
+if (document.fonts) {
+  document.fonts.ready.then(() => { renderWheelImage(); fitList(); });
+  document.fonts.addEventListener?.('loadingdone', () => { renderWheelImage(); fitList(); });
+}
 if (cfg.sound.source === 'file') Sound.loadFile();
-requestAnimationFrame(frame);
+requestAnimationFrame(loop);
 })();
 </script>
 </body>
