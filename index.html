@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roleta de Prêmios</title>
+<meta name="description" content="Sorteador em roleta, white label, com prêmios, participantes e design personalizáveis.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#2a0a5e; --bg2:#7b1fa2; --accent:#ffd23f; --accent-ink:#1b1030; --text:#ffffff;
+  --glass:rgba(255,255,255,.08); --glass-border:rgba(255,255,255,.16); --muted:rgba(255,255,255,.7);
+  --c1:#ff4d6d; --c2:#06d6a0; --c3:#118ab2;
+  --ui-bg:#17141f; --ui-bg2:#211d2c; --ui-line:#332d42; --ui-text:#f1eef7; --ui-muted:#a39cb5; --ui-accent:#8b5cf6;
+  --radius:20px;
+  --font-display:'Baloo 2', 'Poppins', system-ui, sans-serif;
+  --font:'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--font); color:var(--text); overflow-x:hidden;
+  background:var(--bg1);
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- background blobs ---------- */
+.bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;background:radial-gradient(1200px 800px at 15% 10%, color-mix(in srgb, var(--bg2) 85%, transparent), transparent 70%), linear-gradient(140deg, var(--bg1), var(--bg2))}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.38;animation:float 18s ease-in-out infinite}
+.b1{width:42vmax;height:42vmax;background:var(--c1);top:-12vmax;left:-10vmax}
+.b2{width:36vmax;height:36vmax;background:var(--c2);bottom:-14vmax;right:-8vmax;animation-delay:-6s}
+.b3{width:26vmax;height:26vmax;background:var(--accent);top:30%;left:55%;opacity:.22;animation-delay:-11s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(4vmax,3vmax) scale(1.08)}66%{transform:translate(-3vmax,2vmax) scale(.95)}}
+.sparkles{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.55),transparent),radial-gradient(1.5px 1.5px at 70% 20%,rgba(255,255,255,.45),transparent),radial-gradient(2px 2px at 85% 70%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.45),transparent),radial-gradient(1.5px 1.5px at 55% 50%,rgba(255,255,255,.35),transparent);animation:twinkle 4s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.35}to{opacity:1}}
+
+/* ---------- header ---------- */
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:16px;padding:18px clamp(16px,3vw,36px) 6px}
+.brand{display:flex;align-items:center;gap:16px;flex:1;min-width:0}
+.brand img{height:clamp(48px,9vh,92px);max-width:min(240px,30vw);object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
+.brand h1{margin:0;font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,4.2vw,3.2rem);line-height:1;letter-spacing:.3px;text-shadow:0 4px 24px rgba(0,0,0,.25)}
+.brand p{margin:6px 0 0;color:var(--muted);font-size:clamp(.85rem,1.4vw,1.05rem)}
+.brand .tt{min-width:0}
+.actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:44px;height:44px;border-radius:14px;border:1px solid var(--glass-border);background:var(--glass);backdrop-filter:blur(10px);display:grid;place-items:center;transition:.2s}
+.icon-btn:hover{transform:translateY(-2px);background:color-mix(in srgb, var(--glass) 100%, rgba(255,255,255,.08))}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.off{opacity:.55}
+.btn-cfg{height:44px;padding:0 16px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;display:flex;gap:8px;align-items:center;box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent);transition:.2s}
+.btn-cfg:hover{transform:translateY(-2px)}
+.btn-cfg svg{width:18px;height:18px}
+
+/* ---------- stage ---------- */
+.stage{flex:1;display:grid;grid-template-columns:1fr minmax(290px,360px);gap:clamp(16px,2.5vw,32px);padding:8px clamp(16px,3vw,36px) 24px;align-items:center}
+.wheel-area{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0}
+.now{min-height:32px;display:flex;align-items:center;gap:10px;padding:6px 16px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-weight:600;font-size:.95rem;max-width:100%}
+.now .dot{width:12px;height:12px;border-radius:50%;background:var(--dc,var(--accent));box-shadow:0 0 12px var(--dc,var(--accent));flex:none}
+.now span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wheel-wrap{position:relative;width:min(100%, calc(100vh - 300px));min-width:260px;aspect-ratio:1}
+.wheel-wrap canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:manipulation}
+.empty{position:absolute;inset:18%;display:none;place-items:center;text-align:center;border-radius:50%;border:2px dashed var(--glass-border);padding:12%;color:var(--muted)}
+.empty.show{display:grid}
+.empty button{margin-top:12px}
+.controls{display:flex;flex-direction:column;align-items:center;gap:8px}
+.spin-btn{position:relative;border:0;border-radius:999px;padding:16px 56px;font-family:var(--font-display);font-weight:800;font-size:clamp(1.3rem,2.6vw,1.9rem);letter-spacing:2px;color:var(--accent-ink);background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));box-shadow:0 10px 0 color-mix(in srgb, var(--accent) 55%, #000), 0 18px 40px color-mix(in srgb, var(--accent) 45%, transparent);transition:transform .12s, box-shadow .12s, filter .2s;animation:pulse 2.2s ease-in-out infinite}
+.spin-btn:hover{filter:brightness(1.06)}
+.spin-btn:active{transform:translateY(6px);box-shadow:0 4px 0 color-mix(in srgb, var(--accent) 55%, #000), 0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent)}
+.spin-btn:disabled{animation:none;filter:saturate(.5) brightness(.85);cursor:not-allowed}
+@keyframes pulse{0%,100%{scale:1}50%{scale:1.05}}
+.hint{font-size:.8rem;color:var(--muted)}
+.hint kbd{font-family:inherit;padding:1px 7px;border-radius:6px;border:1px solid var(--glass-border);background:var(--glass)}
+
+/* ---------- results panel ---------- */
+.panel{align-self:stretch;max-height:calc(100vh - 140px);display:flex;flex-direction:column;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px}
+.panel-head h2{margin:0;font-family:var(--font-display);font-size:1.5rem}
+.pill{padding:4px 12px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.85rem}
+.bar{height:6px;margin:0 20px 10px;border-radius:9px;background:var(--glass-border);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:9px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.slots{list-style:none;margin:0;padding:4px 12px 12px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:8px}
+.slot{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.12);border:1px solid transparent;transition:.3s}
+.slot::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:4px;background:var(--c)}
+.slot-n{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:.85rem;background:var(--c);color:var(--ci)}
+.slot-body{min-width:0;flex:1}
+.slot-prize{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot-winner{font-weight:700;font-size:.98rem;line-height:1.25;overflow-wrap:anywhere}
+.slot.pending .slot-winner{font-weight:500;color:var(--muted);font-style:italic}
+.slot.next{border-color:var(--c);background:color-mix(in srgb, var(--c) 18%, transparent);box-shadow:0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent)}
+.slot.done{animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.slot.fresh{animation:pop .6s cubic-bezier(.2,1.6,.4,1), glow 1.6s ease-out}
+@keyframes pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+@keyframes glow{0%{box-shadow:0 0 0 0 var(--c)}100%{box-shadow:0 0 0 14px transparent}}
+.redo{flex:none;width:30px;height:30px;border-radius:9px;border:1px solid var(--glass-border);background:transparent;opacity:.6;display:grid;place-items:center;transition:.2s}
+.redo:hover{opacity:1;background:var(--glass)}
+.redo svg{width:15px;height:15px}
+.panel-foot{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--glass-border)}
+.ghost{flex:1 1 auto;min-width:0;height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--glass-border);background:var(--glass);font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;transition:.2s}
+.ghost:hover{background:color-mix(in srgb, var(--glass) 100%, rgba(255,255,255,.1))}
+.ghost svg{width:15px;height:15px;flex:none}
+.empty-list{padding:20px;text-align:center;color:var(--muted);font-size:.9rem}
+
+/* ---------- drawer (neutral control UI) ---------- */
+.scrim{position:fixed;inset:0;background:rgba(5,3,12,.5);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.3s;z-index:40}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--ui-bg);color:var(--ui-text);z-index:41;transform:translateX(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.4)}
+.drawer.show{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px}
+.drawer-head h2{margin:0;font-size:1.2rem}
+.drawer-head small{display:block;color:var(--ui-muted);font-size:.78rem;font-weight:400}
+.x-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--ui-line);background:var(--ui-bg2);display:grid;place-items:center}
+.tabs{display:flex;gap:4px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--ui-line)}
+.tabs button{flex:none;border:0;background:transparent;color:var(--ui-muted);padding:9px 12px;border-radius:10px;font-weight:600;font-size:.86rem;display:flex;gap:6px;align-items:center}
+.tabs button[aria-selected="true"]{background:var(--ui-bg2);color:var(--ui-text);box-shadow:inset 0 -2px 0 var(--ui-accent)}
+.tab-body{flex:1;overflow:auto;padding:18px 20px 40px}
+.tab{display:none}
+.tab.show{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.field{margin-bottom:16px}
+.field > label, .lbl{display:block;font-size:.8rem;font-weight:600;color:var(--ui-muted);margin-bottom:6px}
+.inp, .drawer textarea, .drawer select{width:100%;background:var(--ui-bg2);border:1px solid var(--ui-line);border-radius:12px;padding:10px 12px;outline:none;transition:border-color .2s}
+.inp:focus, .drawer textarea:focus, .drawer select:focus{border-color:var(--ui-accent)}
+.drawer textarea{resize:vertical;min-height:120px;line-height:1.5;font-size:.9rem}
+#namesInput{min-height:300px;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:.85rem}
+.help{font-size:.76rem;color:var(--ui-muted);margin-top:6px;line-height:1.45}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{height:38px;padding:0 14px;border-radius:11px;border:1px solid var(--ui-line);background:var(--ui-bg2);font-weight:600;font-size:.84rem;display:inline-flex;align-items:center;gap:6px;transition:.15s;color:var(--ui-text)}
+.btn:hover{border-color:var(--ui-accent)}
+.btn.primary{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+.btn.danger{color:#ff8a8a}
+.btn svg{width:15px;height:15px}
+.section-title{font-size:.72rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--ui-muted);margin:22px 0 10px;font-weight:700}
+.section-title:first-child{margin-top:0}
+.counter{margin-left:auto;font-size:.8rem;color:var(--ui-muted)}
+.counter b{color:var(--ui-text)}
+
+.prize-row{display:grid;grid-template-columns:62px 1fr 40px 30px;gap:6px;align-items:center;padding:10px;border-radius:14px;background:var(--ui-bg2);border:1px solid var(--ui-line);margin-bottom:8px}
+.prize-row .inp{padding:8px 10px;border-radius:10px;background:var(--ui-bg)}
+.prize-row .p-label{grid-column:1 / 3;font-size:.8rem}
+.prize-row .mv{display:flex;gap:4px;grid-column:3 / 5;justify-content:flex-end}
+.mini{width:30px;height:30px;border-radius:9px;border:1px solid var(--ui-line);background:var(--ui-bg);display:grid;place-items:center;color:var(--ui-muted)}
+.mini:hover{color:var(--ui-text);border-color:var(--ui-accent)}
+.mini svg{width:14px;height:14px}
+input[type=color]{width:40px;height:36px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-bg);padding:3px;cursor:pointer}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}
+details{border:1px dashed var(--ui-line);border-radius:14px;padding:10px 12px;margin-top:12px}
+details summary{cursor:pointer;font-weight:600;font-size:.86rem}
+details[open] summary{margin-bottom:10px}
+
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.preset{border:2px solid transparent;border-radius:14px;padding:0;overflow:hidden;background:var(--ui-bg2);text-align:left;transition:.15s}
+.preset[aria-pressed="true"]{border-color:var(--ui-accent)}
+.preset .sw{height:46px;display:flex;align-items:flex-end;padding:6px;gap:3px}
+.preset .sw i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7)}
+.preset span{display:block;padding:6px 8px;font-size:.78rem;font-weight:600}
+.colors{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.color-field{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--ui-muted)}
+.palette{display:flex;flex-wrap:wrap;gap:6px}
+.logo-box{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:1px dashed var(--ui-line);background:var(--ui-bg2)}
+.logo-box .prev{width:72px;height:72px;border-radius:12px;display:grid;place-items:center;background:repeating-conic-gradient(#2a2535 0 25%, #221e2c 0 50%) 50%/14px 14px;overflow:hidden;flex:none;color:var(--ui-muted);font-size:.7rem;text-align:center}
+.logo-box .prev img{max-width:100%;max-height:100%;object-fit:contain}
+
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:var(--ui-bg2);border:1px solid var(--ui-line);margin-bottom:8px;cursor:pointer}
+.switch b{display:block;font-size:.9rem;font-weight:600}
+.switch small{display:block;color:var(--ui-muted);font-size:.76rem;margin-top:2px}
+.switch input{appearance:none;flex:none;width:46px;height:26px;border-radius:99px;background:var(--ui-line);position:relative;transition:.2s;cursor:pointer}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked{background:var(--ui-accent)}
+.switch input:checked::after{left:23px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{border:2px solid var(--ui-line);border-radius:14px;padding:12px;background:var(--ui-bg2);text-align:left;color:var(--ui-text)}
+.mode[aria-pressed="true"]{border-color:var(--ui-accent);background:color-mix(in srgb, var(--ui-accent) 14%, var(--ui-bg2))}
+.mode b{display:block;font-size:.9rem;margin:6px 0 2px}
+.mode small{color:var(--ui-muted);font-size:.74rem;line-height:1.35;display:block}
+.mode svg{width:34px;height:34px}
+input[type=range]{width:100%;accent-color:var(--ui-accent)}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(5,3,12,.55);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s}
+.modal.show{opacity:1;pointer-events:auto}
+.card{position:relative;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;border-radius:28px;padding:34px 28px 26px;text-align:center;background:linear-gradient(160deg, color-mix(in srgb, var(--bg2) 70%, #fff 6%), var(--bg1));border:1px solid var(--glass-border);box-shadow:0 30px 80px rgba(0,0,0,.5);transform:scale(.7) translateY(30px);transition:transform .5s cubic-bezier(.2,1.5,.4,1);isolation:isolate}
+.modal.show .card{transform:none}
+.rays{position:absolute;left:50%;top:70px;width:520px;height:520px;margin:-260px 0 0 -260px;background:repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--accent) 35%, transparent) 0 8deg, transparent 8deg 20deg);border-radius:50%;mask:radial-gradient(circle, #000 20%, transparent 68%);-webkit-mask:radial-gradient(circle, #000 20%, transparent 68%);animation:spinr 16s linear infinite;z-index:-1;pointer-events:none}
+@keyframes spinr{to{rotate:360deg}}
+.trophy{font-size:64px;line-height:1;animation:bounce 1.2s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 8px 16px rgba(0,0,0,.3))}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(6deg)}}
+.card h3{margin:10px 0 4px;font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--muted);letter-spacing:.5px}
+.prize-tag{display:inline-flex;align-items:center;gap:8px;margin:6px 0 10px;padding:8px 16px;border-radius:999px;background:var(--pc);color:var(--pci);font-weight:700;box-shadow:0 8px 24px color-mix(in srgb, var(--pc) 45%, transparent)}
+.winner{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,6vw,3rem);line-height:1.05;margin:8px 0 18px;overflow-wrap:anywhere;background:linear-gradient(90deg,var(--text), var(--accent), var(--text));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.4s linear infinite, zoomin .7s cubic-bezier(.2,1.6,.4,1)}
+@keyframes shine{to{background-position:-200% 0}}
+@keyframes zoomin{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.win-list{list-style:none;padding:0;margin:14px 0 18px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.win-list li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.18);border:1px solid var(--glass-border);opacity:0;transform:translateY(14px) scale(.96);animation:rise .55s cubic-bezier(.2,1.4,.4,1) forwards}
+.win-list .slot-n{width:30px;height:30px;font-size:.78rem}
+.win-list .w{font-family:var(--font-display);font-weight:800;font-size:1.15rem;line-height:1.15;overflow-wrap:anywhere}
+.win-list .p{font-size:.78rem;color:var(--muted)}
+@keyframes rise{to{opacity:1;transform:none}}
+.card-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.cbtn{height:46px;padding:0 20px;border-radius:14px;border:1px solid var(--glass-border);background:var(--glass);font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.cbtn.main{background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent)}
+.cbtn svg{width:17px;height:17px}
+.note{font-size:.8rem;color:var(--muted);margin:-6px 0 14px}
+
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:#17141f;color:#fff;padding:10px 18px;border-radius:12px;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:toast 3s ease forwards}
+@keyframes toast{0%{opacity:0;transform:translateY(10px)}10%,85%{opacity:1;transform:none}100%{opacity:0}}
+
+/* fullscreen/presentation: hide chrome a bit */
+body.present .hint{display:none}
+
+@media (max-width: 900px){
+  .stage{grid-template-columns:1fr;padding-top:4px}
+  .panel{max-height:none}
+  .wheel-wrap{width:min(100%, 74vh)}
+  .btn-cfg span{display:none}
+  .btn-cfg{width:44px;padding:0;justify-content:center}
+}
+@media (max-width: 520px){
+  .top{flex-wrap:wrap}
+  .brand img{height:52px}
+  .actions{width:100%;justify-content:flex-end}
+  .spin-btn{padding:14px 44px}
+  .presets{grid-template-columns:repeat(2,1fr)}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .blob,.sparkles,.spin-btn,.rays,.trophy,.winner{animation:none!important}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><div class="sparkles"></div></div>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <img id="logo" alt="" hidden>
+      <div class="tt">
+        <h1 id="title">Grande Sorteio</h1>
+        <p id="subtitle"></p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="icon-btn" id="btnMusic" title="Música (M)" aria-label="Ligar ou desligar música"></button>
+      <button class="icon-btn" id="btnSfx" title="Efeitos sonoros" aria-label="Ligar ou desligar efeitos sonoros"></button>
+      <button class="icon-btn" id="btnFull" title="Tela cheia (F)" aria-label="Tela cheia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button class="btn-cfg" id="btnSettings" aria-label="Personalizar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+        <span>Personalizar</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="wheel-area">
+      <div class="now" id="now"><i class="dot"></i><span id="nowText">Pronto para girar</span></div>
+      <div class="wheel-wrap" id="wheelWrap">
+        <canvas id="wheel" aria-label="Roleta de sorteio" role="img"></canvas>
+        <div class="empty" id="emptyWheel">
+          <div>
+            <b>Nenhum participante na roleta</b><br>
+            <small>Cole a lista de nomes para começar.</small><br>
+            <button class="cbtn main" data-open="names">Adicionar nomes</button>
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="spin-btn" id="btnSpin">GIRAR!</button>
+        <div class="hint">Pressione <kbd>Espaço</kbd> para girar · <kbd>F</kbd> tela cheia</div>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="Prêmios e ganhadores">
+      <div class="panel-head"><h2>Prêmios</h2><span class="pill" id="progress">0/0</span></div>
+      <div class="bar"><i id="progressBar"></i></div>
+      <ol class="slots" id="slotList" aria-live="polite"></ol>
+      <div class="panel-foot">
+        <button class="ghost" id="btnCopy" title="Copiar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>Copiar</button>
+        <button class="ghost" id="btnCsv" title="Baixar planilha CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></svg>CSV</button>
+        <button class="ghost" id="btnReset" title="Limpar ganhadores e começar de novo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Novo sorteio</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- Settings drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Personalizar sorteio">
+  <div class="drawer-head">
+    <h2>Personalizar<small>Tudo é salvo automaticamente neste navegador</small></h2>
+    <button class="x-btn" id="btnClose" aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="prizes" aria-selected="true">🎁 Prêmios</button>
+    <button role="tab" data-tab="names">👥 Participantes</button>
+    <button role="tab" data-tab="look">🎨 Aparência</button>
+    <button role="tab" data-tab="draw">🎯 Sorteio</button>
+    <button role="tab" data-tab="sound">🎵 Som</button>
+  </nav>
+  <div class="tab-body">
+    <!-- PRIZES -->
+    <section class="tab show" data-panel="prizes">
+      <div class="row" style="margin-bottom:12px"><span class="section-title" style="margin:0">Lista de prêmios</span><span class="counter" id="prizeCount"></span></div>
+      <div id="prizeEditor"></div>
+      <div class="row">
+        <button class="btn primary" id="btnAddPrize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Adicionar prêmio</button>
+      </div>
+      <p class="help">A ordem define a posição (1º, 2º…). Cada unidade vira um ponteiro na roleta. O "texto no ponteiro" é o rótulo curto mostrado na roleta — se ficar vazio, é gerado automaticamente (ex.: R$ 100).</p>
+      <details>
+        <summary>Colar lista de prêmios em texto</summary>
+        <textarea id="prizePaste" placeholder="4 X Cupom de R$ 100,00&#10;1 X 70,00&#10;1 X 50,00&#10;1 X 30,00"></textarea>
+        <p class="help">Uma linha por prêmio, no formato <b>quantidade X descrição</b>. Substitui a lista atual.</p>
+        <button class="btn" id="btnPrizePaste">Aplicar lista</button>
+      </details>
+    </section>
+
+    <!-- NAMES -->
+    <section class="tab" data-panel="names">
+      <div class="row" style="margin-bottom:8px"><span class="section-title" style="margin:0">Participantes</span><span class="counter" id="nameCount"></span></div>
+      <textarea id="namesInput" spellcheck="false" placeholder="Cole aqui, um nome por linha&#10;&#10;MARIA DA SILVA&#10;JOÃO PEREIRA&#10;..."></textarea>
+      <p class="help">Um nome por linha. Numeração no começo (ex.: "1. ", "2 - ") é ignorada automaticamente.</p>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnShuffle">🔀 Embaralhar</button>
+        <button class="btn" id="btnDedupe">🧹 Remover repetidos</button>
+        <label class="btn" style="cursor:pointer">📄 Importar .txt/.csv<input type="file" id="namesFile" accept=".txt,.csv,text/plain,text/csv" hidden></label>
+        <button class="btn danger" id="btnClearNames">Limpar</button>
+      </div>
+      <p class="help" id="dupWarn"></p>
+    </section>
+
+    <!-- LOOK -->
+    <section class="tab" data-panel="look">
+      <div class="section-title">Identidade</div>
+      <div class="field"><label for="inTitle">Título</label><input class="inp" id="inTitle" maxlength="80"></div>
+      <div class="field"><label for="inSubtitle">Subtítulo</label><input class="inp" id="inSubtitle" maxlength="140"></div>
+      <div class="field">
+        <span class="lbl">Logo da empresa</span>
+        <div class="logo-box">
+          <div class="prev" id="logoPrev">sem logo</div>
+          <div>
+            <div class="row">
+              <label class="btn primary" style="cursor:pointer">Enviar imagem<input type="file" id="logoFile" accept="image/*" hidden></label>
+              <button class="btn danger" id="btnLogoRemove">Remover</button>
+            </div>
+            <p class="help" style="margin-bottom:0">PNG com fundo transparente fica melhor. Também aparece no centro da roleta.</p>
+          </div>
+        </div>
+      </div>
+      <label class="switch"><span><b>Logo no centro da roleta</b><small>Mostra a logo no miolo da roleta</small></span><input type="checkbox" id="inHubLogo"></label>
+
+      <div class="section-title">Tema</div>
+      <div class="presets" id="presets"></div>
+
+      <div class="section-title">Cores personalizadas</div>
+      <div class="colors">
+        <label class="color-field"><input type="color" id="cBg1">Fundo 1</label>
+        <label class="color-field"><input type="color" id="cBg2">Fundo 2</label>
+        <label class="color-field"><input type="color" id="cAccent">Destaque</label>
+        <label class="color-field"><input type="color" id="cText">Texto</label>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <span class="lbl">Cores das fatias da roleta</span>
+        <div class="palette" id="paletteEditor"></div>
+      </div>
+      <label class="switch"><span><b>Confetes</b><small>Chuva de confetes ao revelar ganhadores</small></span><input type="checkbox" id="inConfetti"></label>
+    </section>
+
+    <!-- DRAW -->
+    <section class="tab" data-panel="draw">
+      <div class="section-title">Como sortear</div>
+      <div class="modes">
+        <button class="mode" data-mode="multi">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="20" r="12"/><path d="M20 2v6M20 32v6M2 20h6M32 20h6M7 7l4 4M29 29l4 4M33 7l-4 4M7 33l4-4"/></svg>
+          <b>Vários ponteiros</b><small>Um ponteiro por prêmio. Um único giro revela todos os ganhadores.</small>
+        </button>
+        <button class="mode" data-mode="single">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="20" cy="22" r="13"/><path d="M20 2v10" stroke-width="3" stroke-linecap="round"/></svg>
+          <b>Um por vez</b><small>Um giro para cada prêmio, com revelação individual.</small>
+        </button>
+      </div>
+      <div style="height:12px"></div>
+      <label class="switch"><span><b>Do último para o primeiro</b><small>Sorteia do menor prêmio até o principal (mais suspense)</small></span><input type="checkbox" id="inReverse"></label>
+      <label class="switch"><span><b>Remover ganhadores da roleta</b><small>Cada pessoa ganha no máximo um prêmio</small></span><input type="checkbox" id="inRemove"></label>
+      <div class="field" style="margin-top:14px">
+        <label for="inDuration">Duração do giro: <b id="durVal"></b></label>
+        <input type="range" id="inDuration" min="3" max="20" step="1">
+      </div>
+
+      <div class="section-title">Backup e white label</div>
+      <p class="help" style="margin-top:0">Exporte a configuração (prêmios, nomes, tema e logo) para reutilizar em outro computador ou criar modelos por cliente.</p>
+      <div class="row">
+        <button class="btn" id="btnExport">⬇️ Exportar configuração</button>
+        <label class="btn" style="cursor:pointer">⬆️ Importar<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+        <button class="btn danger" id="btnFactory">Restaurar padrão</button>
+      </div>
+    </section>
+
+    <!-- SOUND -->
+    <section class="tab" data-panel="sound">
+      <div class="section-title">Música e efeitos</div>
+      <label class="switch"><span><b>Música de fundo</b><small>Toca em loop durante o sorteio</small></span><input type="checkbox" id="inMusic"></label>
+      <label class="switch"><span><b>Efeitos sonoros</b><small>Cliques da roleta, fanfarra e aplausos</small></span><input type="checkbox" id="inSfx"></label>
+      <div class="field" style="margin-top:14px">
+        <label for="inVolume">Volume: <b id="volVal"></b></label>
+        <input type="range" id="inVolume" min="0" max="1" step="0.05">
+      </div>
+      <div class="field">
+        <label for="inSource">Trilha</label>
+        <select id="inSource">
+          <option value="synth">Trilha festa (embutida)</option>
+          <option value="file">Minha música (arquivo)</option>
+        </select>
+      </div>
+      <div class="field" id="fileField">
+        <div class="row">
+          <label class="btn primary" style="cursor:pointer">Enviar MP3/áudio<input type="file" id="musicFile" accept="audio/*" hidden></label>
+          <button class="btn danger" id="btnMusicRemove">Remover</button>
+        </div>
+        <p class="help" id="musicName">Nenhum arquivo enviado.</p>
+      </div>
+      <p class="help">Navegadores só liberam som após um clique na página — se a música não começar sozinha, clique no botão ♪.</p>
+    </section>
+  </div>
+</aside>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-live="assertive"><div class="card" id="card"></div></div>
+<canvas id="confetti"></canvas>
+<div class="toasts" id="toasts"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= utils ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const TAU = Math.PI * 2;
+const mod = (a, n) => ((a % n) + n) % n;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => s.toLocaleUpperCase('pt-BR').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+// Crypto-backed randomness: every name has the same chance.
+function rand() {
+  if (window.crypto && crypto.getRandomValues) return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+  return Math.random();
+}
+const randInt = n => Math.floor(rand() * n);
+
+function hexToRgb(h) {
+  h = String(h || '#000').replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16) || 0;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function lum(h) {
+  const [r, g, b] = hexToRgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+const ink = h => (lum(h) > 0.4 ? '#1b1030' : '#ffffff');
+const rgba = (h, a) => { const [r, g, b] = hexToRgb(h); return `rgba(${r},${g},${b},${a})`; };
+const shade = (h, p) => { const [r, g, b] = hexToRgb(h); const f = v => Math.round(p < 0 ? v * (1 + p) : v + (255 - v) * p); return `rgb(${f(r)},${f(g)},${f(b)})`; };
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3100);
+}
+function download(name, content, type) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ================= config ================= */
+const STORE_KEY = 'sorteador-roleta:v1';
+const PRESETS = {
+  festa:    { name: 'Festa',      bg1: '#2a0a5e', bg2: '#7b1fa2', accent: '#ffd23f', text: '#ffffff', palette: ['#ff4d6d', '#ffb703', '#06d6a0', '#118ab2', '#8338ec', '#fb5607'] },
+  neon:     { name: 'Neon',       bg1: '#05010f', bg2: '#1d0047', accent: '#00f5d4', text: '#ffffff', palette: ['#f72585', '#7209b7', '#4361ee', '#4cc9f0', '#00f5d4', '#b5179e'] },
+  tropical: { name: 'Tropical',   bg1: '#003049', bg2: '#0a9396', accent: '#ffd166', text: '#ffffff', palette: ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#f78c6b', '#83d483'] },
+  sunset:   { name: 'Pôr do sol', bg1: '#3d0c11', bg2: '#e85d2a', accent: '#fff3b0', text: '#ffffff', palette: ['#ff595e', '#ffca3a', '#ff924c', '#c5ca30', '#8ac926', '#ff7aa2'] },
+  elegante: { name: 'Elegante',   bg1: '#0b0b0f', bg2: '#2e2823', accent: '#e6c068', text: '#f5efe1', palette: ['#e6c068', '#25222b', '#b08d3c', '#3a342e', '#f3dfa2', '#4a4038'] },
+  doce:     { name: 'Doce',       bg1: '#ffe5ec', bg2: '#cdb4db', accent: '#ff006e', text: '#3d0a2a', palette: ['#ff8fab', '#ffc8dd', '#a2d2ff', '#bde0fe', '#cdb4db', '#ffafcc'] },
+};
+const DEFAULT_NAMES = `PABLO NUNES GOMES
+NILSON DOS SANTOS DUARTE
+MILENE COSTA
+MARCELA JARDINE
+LUIS EDUARDO TEJADA DA SILVA
+THAMERSON DUTRA LEITES
+MARCO ANTONIO DE MATTOS PAIM
+RAFAELA MENEZES`;
+
+function defaults() {
+  const p = PRESETS.festa;
+  return {
+    v: 1,
+    title: 'Grande Sorteio',
+    subtitle: 'Boa sorte a todos os participantes! 🍀',
+    logo: '', hubLogo: true,
+    preset: 'festa',
+    theme: { bg1: p.bg1, bg2: p.bg2, accent: p.accent, text: p.text, palette: [...p.palette] },
+    prizes: [
+      { id: uid(), qty: 4, name: 'Cupom de R$ 100,00', label: '', color: '#ffd23f' },
+      { id: uid(), qty: 1, name: 'Cupom de R$ 70,00', label: '', color: '#ff4d6d' },
+      { id: uid(), qty: 1, name: 'Cupom de R$ 50,00', label: '', color: '#06d6a0' },
+      { id: uid(), qty: 1, name: 'Cupom de R$ 30,00', label: '', color: '#4cc9f0' },
+    ],
+    namesText: DEFAULT_NAMES,
+    mode: 'multi', reverseOrder: true, removeWinners: true, spinSeconds: 8, confetti: true,
+    sound: { music: false, sfx: true, volume: 0.7, source: 'synth', fileName: '' },
+    results: {}, absent: [],
+  };
+}
+function merge(base, saved) {
+  const out = { ...base, ...saved };
+  out.theme = { ...base.theme, ...(saved.theme || {}) };
+  out.sound = { ...base.sound, ...(saved.sound || {}) };
+  if (!Array.isArray(out.theme.palette) || !out.theme.palette.length) out.theme.palette = [...base.theme.palette];
+  if (!Array.isArray(out.prizes)) out.prizes = base.prizes;
+  out.prizes = out.prizes.map(p => ({ id: p.id || uid(), qty: p.qty ?? 1, name: p.name || '', label: p.label || '', color: p.color || '#ffd23f' }));
+  if (!out.results || typeof out.results !== 'object') out.results = {};
+  if (!Array.isArray(out.absent)) out.absent = [];
+  return out;
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return merge(defaults(), JSON.parse(raw));
+  } catch (e) { /* storage blocked or corrupt */ }
+  return defaults();
+}
+let cfg = load();
+let saveWarned = false;
+const save = debounce(() => {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(cfg)); }
+  catch (e) { if (!saveWarned) { saveWarned = true; toast('Não foi possível salvar (armazenamento cheio ou bloqueado).'); } }
+}, 200);
+
+/* ================= domain ================= */
+function parseNames(text) {
+  return String(text || '').split(/\r?\n|;/)
+    .map(s => s.replace(/^\s*\d+\s*[.)\-–:]\s+/, '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+function shortLabel(p) {
+  if (p.label && p.label.trim()) return p.label.trim();
+  const name = (p.name || '').trim();
+  const m = name.match(/R\$\s?\d[\d.]*(,\d{1,2})?/i) || name.match(/\d[\d.]*,\d{2}/);
+  if (m) return 'R$ ' + m[0].replace(/R\$\s?/i, '').replace(/,00$/, '');
+  if (!name) return 'Prêmio';
+  return name.length > 12 ? name.slice(0, 11) + '…' : name;
+}
+function getSlots() {
+  const out = [];
+  cfg.prizes.forEach(p => {
+    const q = clamp(parseInt(p.qty, 10) || 0, 0, 500);
+    for (let j = 0; j < q; j++) out.push({ key: p.id + '#' + j, prize: p, name: p.name || 'Prêmio', color: p.color || cfg.theme.accent, label: shortLabel(p) });
+  });
+  out.forEach((s, i) => { s.pos = i + 1; });
+  return out;
+}
+function pendingSlots() {
+  const p = getSlots().filter(s => !cfg.results[s.key]);
+  return cfg.reverseOrder ? p.reverse() : p;
+}
+function remainingNames() {
+  const ex = new Set(cfg.absent.map(norm));
+  if (cfg.removeWinners) getSlots().forEach(s => { const r = cfg.results[s.key]; if (r) ex.add(norm(r.winner)); });
+  return parseNames(cfg.namesText).filter(n => !ex.has(norm(n)));
+}
+
+/* ================= theme & header ================= */
+function applyTheme() {
+  const t = cfg.theme, r = document.documentElement.style;
+  r.setProperty('--bg1', t.bg1); r.setProperty('--bg2', t.bg2);
+  r.setProperty('--accent', t.accent); r.setProperty('--accent-ink', ink(t.accent));
+  r.setProperty('--text', t.text);
+  const light = lum(t.bg1) > 0.45;
+  r.setProperty('--glass', light ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.08)');
+  r.setProperty('--glass-border', light ? 'rgba(0,0,0,.09)' : 'rgba(255,255,255,.16)');
+  r.setProperty('--muted', rgba(t.text, 0.72));
+  r.setProperty('--c1', t.palette[0] || t.accent);
+  r.setProperty('--c2', t.palette[2] || t.palette[1] || t.accent);
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', t.bg1);
+}
+function renderHeader() {
+  $('#title').textContent = cfg.title || '';
+  $('#subtitle').textContent = cfg.subtitle || '';
+  $('#subtitle').hidden = !cfg.subtitle;
+  document.title = cfg.title ? cfg.title + ' · Roleta' : 'Roleta de Prêmios';
+  const img = $('#logo');
+  if (cfg.logo) { img.src = cfg.logo; img.hidden = false; } else { img.removeAttribute('src'); img.hidden = true; }
+  const prev = $('#logoPrev');
+  prev.innerHTML = cfg.logo ? `<img src="${cfg.logo}" alt="">` : 'sem logo';
+  S.logoImg = null;
+  if (cfg.logo) { const im = new Image(); im.onload = () => { S.logoImg = im; }; im.src = cfg.logo; }
+}
+
+/* ================= wheel state & layout ================= */
+const canvas = $('#wheel'), ctx = canvas.getContext('2d');
+const off = document.createElement('canvas');
+const S = {
+  angle: -0.3, spinning: false, spin: null,
+  names: [], pointers: [], highlight: [], flaps: [], lastIdx: [],
+  needsRebuild: false, logoImg: null, lastTick: 0, celebrating: 0,
+};
+const L = { size: 0, c: 0, R: 0, Rw: 0, rim: 0, dpr: 1 };
+
+function computePointers() {
+  const pend = pendingSlots();
+  const N = S.names.length;
+  if (cfg.mode === 'single' || pend.length === 0) {
+    return [{ angle: -Math.PI / 2, slot: pend[0] || null }];
+  }
+  const P = Math.max(1, Math.min(pend.length, N || 1));
+  return pend.slice(0, P).map((slot, k) => ({ angle: -Math.PI / 2 + (k * TAU) / P, slot }));
+}
+
+function layout() {
+  const wrap = $('#wheelWrap');
+  const rect = wrap.getBoundingClientRect();
+  const css = Math.max(220, Math.floor(Math.min(rect.width, rect.height || rect.width)));
+  L.dpr = Math.min(2, window.devicePixelRatio || 1);
+  L.size = Math.round(css * L.dpr);
+  canvas.width = canvas.height = L.size;
+  L.c = L.size / 2;
+  L.R = (L.size / 2) * (cfg.mode === 'multi' && S.pointers.length > 1 ? (css < 520 ? 0.72 : 0.78) : 0.86);
+  L.rim = Math.max(10 * L.dpr, L.R * 0.065);
+  L.Rw = L.R - L.rim;
+  renderWheelImage();
+}
+
+function buildWheel() {
+  if (S.spinning || modalOpen) { S.needsRebuild = true; return; }
+  S.needsRebuild = false;
+  S.names = remainingNames();
+  S.pointers = computePointers();
+  S.flaps = S.pointers.map(() => 0);
+  layout();
+  $('#emptyWheel').classList.toggle('show', S.names.length === 0);
+  updateNow();
+  updateSpinBtn();
+}
+
+function fitText(g, text, maxW) {
+  if (g.measureText(text).width <= maxW) return text;
+  let lo = 0, hi = text.length;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (g.measureText(text.slice(0, mid) + '…').width <= maxW) lo = mid; else hi = mid - 1; }
+  return text.slice(0, lo).trimEnd() + '…';
+}
+
+function segColor(i, N) {
+  const pal = cfg.theme.palette;
+  let c = pal[i % pal.length];
+  if (N > 1 && i === N - 1 && pal.length > 2 && (N - 1) % pal.length === 0) c = pal[Math.floor(pal.length / 2)];
+  return c;
+}
+
+function renderWheelImage() {
+  const Rw = L.Rw, d = Math.ceil(Rw * 2) + 2;
+  off.width = off.height = d;
+  const g = off.getContext('2d');
+  g.clearRect(0, 0, d, d);
+  g.save(); g.translate(d / 2, d / 2);
+  const names = S.names, N = names.length;
+  if (!N) {
+    g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.fillStyle = 'rgba(255,255,255,.1)'; g.fill();
+    g.restore(); return;
+  }
+  const s = TAU / N;
+  for (let i = 0; i < N; i++) {
+    g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath();
+    g.fillStyle = segColor(i, N); g.fill();
+  }
+  // depth shading
+  const sh = g.createRadialGradient(0, 0, Rw * 0.15, 0, 0, Rw);
+  sh.addColorStop(0, 'rgba(255,255,255,.22)'); sh.addColorStop(0.55, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,.25)');
+  g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.fillStyle = sh; g.fill();
+  // separators
+  if (N > 1 && N <= 240) {
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = Math.max(1, L.dpr * (N > 60 ? 0.7 : 1.5));
+    for (let i = 0; i < N; i++) { const a = i * s; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * Rw, Math.sin(a) * Rw); g.stroke(); }
+  }
+  // labels
+  const fs = Math.min(Rw * 0.072, s * Rw * 0.5);
+  if (fs >= 6.5 * L.dpr) {
+    g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.font = `700 ${fs}px Poppins, system-ui, sans-serif`;
+    const maxW = Rw * 0.66;
+    for (let i = 0; i < N; i++) {
+      const a = (i + 0.5) * s, col = segColor(i, N);
+      g.save(); g.rotate(a);
+      g.fillStyle = ink(col);
+      g.shadowColor = ink(col) === '#ffffff' ? 'rgba(0,0,0,.35)' : 'rgba(255,255,255,.25)';
+      g.shadowBlur = 3 * L.dpr;
+      g.fillText(fitText(g, names[i], maxW), Rw * 0.92, 0);
+      g.restore();
+    }
+  }
+  g.restore();
+}
+
+/* ================= drawing ================= */
+function roundRect(g, x, y, w, h, r) {
+  g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+function idxAt(phi, angle) {
+  const N = S.names.length; if (!N) return -1;
+  return Math.floor(mod(phi - angle, TAU) / (TAU / N)) % N;
+}
+
+function draw(t) {
+  const g = ctx, { R, Rw, rim, dpr } = L, accent = cfg.theme.accent;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, L.size, L.size);
+  g.translate(L.c, L.c);
+
+  // glow + rim
+  g.save();
+  g.shadowColor = rgba(accent, S.celebrating > t ? 0.85 : 0.45);
+  g.shadowBlur = R * (S.celebrating > t ? 0.22 + 0.06 * Math.sin(t / 120) : 0.14);
+  g.beginPath(); g.arc(0, 0, R, 0, TAU);
+  const rg = g.createLinearGradient(-R, -R, R, R);
+  rg.addColorStop(0, shade(accent, 0.35)); rg.addColorStop(0.5, shade(accent, -0.35)); rg.addColorStop(1, shade(accent, 0.15));
+  g.fillStyle = rg; g.fill();
+  g.restore();
+
+  // rotating wheel
+  g.save(); g.rotate(S.angle);
+  g.drawImage(off, -off.width / 2, -off.height / 2);
+  const N = S.names.length;
+  if (S.highlight.length && N) {
+    const s = TAU / N, set = new Set(S.highlight);
+    g.fillStyle = 'rgba(0,0,0,.42)';
+    if (N <= 3000) {
+      for (let i = 0; i < N; i++) {
+        if (set.has(i)) continue;
+        g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath(); g.fill();
+      }
+    }
+    const pulse = 0.18 + 0.14 * Math.sin(t / 160);
+    g.fillStyle = `rgba(255,255,255,${pulse})`;
+    g.strokeStyle = '#fff'; g.lineWidth = 3 * dpr;
+    set.forEach(i => { g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, Rw, i * s, (i + 1) * s); g.closePath(); g.fill(); g.stroke(); });
+  }
+  g.restore();
+
+  // inner rim shadow
+  g.beginPath(); g.arc(0, 0, Rw, 0, TAU); g.lineWidth = 3 * dpr; g.strokeStyle = 'rgba(0,0,0,.25)'; g.stroke();
+
+  // bulbs
+  const nb = clamp(Math.round(R / (11 * dpr)), 16, 44), br = rim * 0.26, rr = Rw + rim / 2;
+  const celebrating = S.celebrating > t;
+  for (let i = 0; i < nb; i++) {
+    let on;
+    if (S.spinning) on = (i + Math.floor(t / 60)) % 3 === 0;
+    else if (celebrating) on = Math.floor(t / 140) % 2 === 0;
+    else on = (i + Math.floor(t / 650)) % 2 === 0;
+    const a = (i / nb) * TAU;
+    g.beginPath(); g.arc(Math.cos(a) * rr, Math.sin(a) * rr, br, 0, TAU);
+    if (on) { g.save(); g.shadowColor = '#fff6c7'; g.shadowBlur = br * 3; g.fillStyle = '#fffbe6'; g.fill(); g.restore(); }
+    else { g.fillStyle = 'rgba(255,255,255,.28)'; g.fill(); }
+  }
+
+  // hub
+  const hr = Rw * 0.17;
+  g.save(); g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = hr * 0.4;
+  g.beginPath(); g.arc(0, 0, hr, 0, TAU);
+  const hg = g.createRadialGradient(-hr * 0.3, -hr * 0.3, hr * 0.1, 0, 0, hr);
+  const useLogo = cfg.hubLogo && S.logoImg;
+  hg.addColorStop(0, useLogo ? '#ffffff' : shade(accent, 0.45)); hg.addColorStop(1, useLogo ? '#eeeeee' : accent);
+  g.fillStyle = hg; g.fill(); g.restore();
+  g.lineWidth = Math.max(3 * dpr, hr * 0.1); g.strokeStyle = '#fff'; g.beginPath(); g.arc(0, 0, hr, 0, TAU); g.stroke();
+  if (useLogo) {
+    const im = S.logoImg, box = hr * 1.45, sc = Math.min(box / im.width, box / im.height);
+    g.save(); g.beginPath(); g.arc(0, 0, hr * 0.92, 0, TAU); g.clip();
+    g.drawImage(im, -im.width * sc / 2, -im.height * sc / 2, im.width * sc, im.height * sc); g.restore();
+  } else {
+    g.fillStyle = ink(accent); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `800 ${hr * 0.36}px 'Baloo 2', Poppins, sans-serif`;
+    g.fillText(S.spinning ? '★' : 'GIRAR', 0, hr * 0.04);
+  }
+
+  // pointers
+  const P = S.pointers.length;
+  const pw = Math.min(R * 0.085, P > 1 ? (TAU * R / P) * 0.38 : Infinity);
+  S.pointers.forEach((p, k) => drawPointer(g, p, k, pw, t));
+}
+
+function drawPointer(g, p, k, pw, t) {
+  const { R, Rw, rim, dpr } = L;
+  const color = p.slot ? p.slot.color : cfg.theme.accent;
+  const pivot = R + rim * 0.15;
+  const len = pivot - Rw + pw * 0.55;
+  const won = S.highlight.length && !S.spinning;
+  g.save(); g.rotate(p.angle); g.translate(pivot, 0); g.rotate(-(S.flaps[k] || 0));
+  g.shadowColor = 'rgba(0,0,0,.4)'; g.shadowBlur = pw * 0.35; g.shadowOffsetY = 2 * dpr;
+  g.beginPath();
+  g.moveTo(-len, 0);
+  g.bezierCurveTo(-len * 0.55, -pw * 0.18, -pw * 0.35, -pw * 0.62, pw * 0.15, -pw * 0.55);
+  g.arc(pw * 0.15, 0, pw * 0.55, -Math.PI / 2, Math.PI / 2);
+  g.bezierCurveTo(-pw * 0.35, pw * 0.62, -len * 0.55, pw * 0.18, -len, 0);
+  g.closePath();
+  const grad = g.createLinearGradient(-len, 0, pw, 0);
+  grad.addColorStop(0, shade(color, -0.25)); grad.addColorStop(1, shade(color, 0.25));
+  g.fillStyle = grad; g.fill();
+  g.shadowColor = 'transparent';
+  g.lineWidth = Math.max(1.5, 2 * dpr); g.strokeStyle = '#fff'; g.stroke();
+  g.beginPath(); g.arc(pw * 0.15, 0, pw * 0.2, 0, TAU); g.fillStyle = '#fff'; g.fill();
+  g.restore();
+
+  // badge with prize label (multi mode)
+  if (!p.slot || S.pointers.length < 2) return;
+  const fs = clamp(pw * 0.62, 9 * dpr, L.size * 0.026);
+  g.font = `800 ${fs}px Poppins, system-ui, sans-serif`;
+  const label = fitText(g, p.slot.label, L.size * 0.12);
+  const bw = g.measureText(label).width + fs * 1.1, bh = fs * 1.6;
+  const cx = Math.cos(p.angle), cy = Math.sin(p.angle);
+  const dist = pivot + pw * 0.75 + Math.abs(cx) * bw / 2 + Math.abs(cy) * bh / 2 + 3 * dpr;
+  const x = cx * dist, y = cy * dist;
+  const sc = won ? 1 + 0.07 * Math.sin(t / 150 + k) : 1;
+  g.save(); g.translate(x, y); g.scale(sc, sc);
+  g.shadowColor = 'rgba(0,0,0,.3)'; g.shadowBlur = 6 * dpr;
+  roundRect(g, -bw / 2, -bh / 2, bw, bh, bh / 2); g.fillStyle = color; g.fill();
+  g.shadowColor = 'transparent'; g.lineWidth = 1.5 * dpr; g.strokeStyle = 'rgba(255,255,255,.85)'; g.stroke();
+  g.fillStyle = ink(color); g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(label, 0, fs * 0.05);
+  g.restore();
+}
+
+/* ================= spin ================= */
+const easeOut = p => 1 - Math.pow(1 - p, 4);
+
+function spin() {
+  if (S.spinning) return;
+  if (modalOpen) closeModal();
+  if (S.needsRebuild) buildWheel();
+  Sound.unlock();
+  const N = S.names.length;
+  if (!N) { toast('Adicione participantes para sortear.'); openDrawer('names'); return; }
+  if (!S.pointers[0] || !S.pointers[0].slot) {
+    toast(getSlots().length ? 'Todos os prêmios já foram sorteados! 🎉' : 'Cadastre ao menos um prêmio.');
+    if (!getSlots().length) openDrawer('prizes');
+    return;
+  }
+  const s = TAU / N, P = S.pointers.length;
+  let target = null;
+  if (P === 1) {
+    const idx = randInt(N), offs = 0.15 + rand() * 0.7;
+    target = mod(S.pointers[0].angle - (idx + offs) * s, TAU);
+  } else {
+    // Uniform random rotation; pointers are evenly spaced so each one lands on a distinct name.
+    const q = P / gcd(N, P), m = Math.min(0.18, 0.35 / q);
+    for (let i = 0; i < 800 && target === null; i++) {
+      const th = rand() * TAU;
+      const ok = S.pointers.every(p => { const a = mod(p.angle - th, TAU) / s; const f = a - Math.floor(a); return f > m && f < 1 - m; });
+      if (ok) target = th;
+    }
+    if (target === null) target = rand() * TAU;
+  }
+  const turns = Math.round(cfg.spinSeconds * 0.9) + 3;
+  const from = S.angle;
+  S.spin = { from, to: from + turns * TAU + mod(target - from, TAU), t0: performance.now(), dur: cfg.spinSeconds * 1000 };
+  S.spinning = true; S.highlight = [];
+  S.lastIdx = S.pointers.map(p => idxAt(p.angle, from));
+  updateSpinBtn(); updateNow();
+  Sound.whoosh(); Sound.duck(true);
+}
+
+function stepSpin(t) {
+  const sp = S.spin;
+  const p = clamp((t - sp.t0) / sp.dur, 0, 1);
+  S.angle = sp.from + (sp.to - sp.from) * easeOut(p);
+  S.pointers.forEach((ptr, k) => {
+    const i = idxAt(ptr.angle, S.angle);
+    if (i !== S.lastIdx[k]) {
+      S.lastIdx[k] = i;
+      S.flaps[k] = Math.min(0.55, (S.flaps[k] || 0) + 0.32);
+      if (k === 0) Sound.tick();
+    }
+  });
+  if (p >= 1) {
+    S.spinning = false;
+    S.angle = mod(sp.to, TAU);
+    onSpinEnd();
+  }
+}
+
+function onSpinEnd() {
+  const wins = [];
+  S.pointers.forEach(p => {
+    if (!p.slot) return;
+    const i = idxAt(p.angle, S.angle);
+    const name = S.names[i];
+    if (name == null) return;
+    cfg.results[p.slot.key] = { winner: name, at: Date.now() };
+    wins.push({ slot: p.slot, name, idx: i });
+  });
+  S.highlight = wins.map(w => w.idx);
+  S.celebrating = performance.now() + 4000;
+  save();
+  Sound.duck(false);
+  Sound.fanfare();
+  if (cfg.confetti) Confetti.burst(wins.length > 1 ? 260 : 180);
+  updateSpinBtn();
+  setTimeout(() => { renderResults(wins.map(w => w.slot.key)); showWinners(wins); }, 650);
+}
+
+function updateSpinBtn() {
+  const b = $('#btnSpin');
+  const done = getSlots().length > 0 && pendingSlots().length === 0;
+  b.disabled = S.spinning || done;
+  b.textContent = S.spinning ? 'GIRANDO…' : done ? 'CONCLUÍDO 🎉' : 'GIRAR!';
+}
+function updateNow() {
+  const el = $('#now'), txt = $('#nowText');
+  const pend = pendingSlots(), total = getSlots().length;
+  if (!total) { el.style.setProperty('--dc', cfg.theme.accent); txt.textContent = 'Cadastre os prêmios em Personalizar'; return; }
+  if (!pend.length) { el.style.setProperty('--dc', cfg.theme.accent); txt.textContent = 'Sorteio concluído! Parabéns aos ganhadores 🎉'; return; }
+  const n = S.names.length;
+  if (cfg.mode === 'single' || S.pointers.length < 2) {
+    const s = pend[0];
+    el.style.setProperty('--dc', s.color);
+    txt.textContent = `${S.spinning ? 'Sorteando' : 'Próximo'}: ${s.pos}º prêmio · ${s.name} · ${n} na roleta`;
+  } else {
+    el.style.setProperty('--dc', cfg.theme.accent);
+    txt.textContent = `${S.pointers.length} prêmios em um giro · ${n} participantes`;
+  }
+}
+
+/* ================= results panel ================= */
+function renderResults(fresh = []) {
+  const slots = getSlots(), list = $('#slotList');
+  const next = new Set(S.spinning ? [] : S.pointers.filter(p => p.slot).map(p => p.slot.key));
+  const done = slots.filter(s => cfg.results[s.key]).length;
+  $('#progress').textContent = `${done}/${slots.length}`;
+  $('#progressBar').style.width = slots.length ? (done / slots.length * 100) + '%' : '0';
+  if (!slots.length) { list.innerHTML = '<li class="empty-list">Nenhum prêmio cadastrado.<br>Abra <b>Personalizar → Prêmios</b>.</li>'; return; }
+  list.innerHTML = slots.map(s => {
+    const r = cfg.results[s.key];
+    const cls = r ? 'done' + (fresh.includes(s.key) ? ' fresh' : '') : 'pending' + (next.has(s.key) ? ' next' : '');
+    return `<li class="slot ${cls}" style="--c:${s.color};--ci:${ink(s.color)}">
+      <span class="slot-n">${s.pos}º</span>
+      <div class="slot-body"><div class="slot-prize">${esc(s.name)}</div>
+      <div class="slot-winner">${r ? esc(r.winner) : 'aguardando sorteio…'}</div></div>
+      ${r ? `<button class="redo" data-redo="${esc(s.key)}" title="Ganhador ausente? Sortear este prêmio de novo" aria-label="Sortear novamente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></button>` : ''}
+    </li>`;
+  }).join('');
+  const f = list.querySelector('.fresh') || list.querySelector('.next');
+  if (f) f.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function redoSlot(key, auto) {
+  const r = cfg.results[key];
+  if (!r) return;
+  cfg.absent.push(r.winner);
+  delete cfg.results[key];
+  save();
+  S.highlight = [];
+  if (modalOpen) closeModal(); else buildWheel();
+  renderResults();
+  toast(`${r.winner} marcado(a) como ausente. Prêmio liberado.`);
+  if (auto) setTimeout(spin, 450);
+}
+
+function resultText() {
+  const lines = [`🏆 ${cfg.title || 'Sorteio'}`, ''];
+  getSlots().forEach(s => { const r = cfg.results[s.key]; lines.push(`${s.pos}º ${s.name} — ${r ? r.winner : '(pendente)'}`); });
+  return lines.join('\n');
+}
+
+/* ================= modal ================= */
+let modalOpen = false;
+function showWinners(wins) {
+  if (!wins.length) return;
+  const card = $('#card');
+  const remaining = pendingSlots().length;
+  const nextBtn = remaining
+    ? `<button class="cbtn main" data-act="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>${cfg.mode === 'single' ? 'Próximo prêmio' : 'Girar de novo'}</button>`
+    : `<button class="cbtn main" data-act="close">Ver resultado final</button>`;
+  if (wins.length === 1) {
+    const w = wins[0];
+    card.innerHTML = `<div class="rays"></div>
+      <div class="trophy">🏆</div>
+      <h3>${remaining ? 'TEMOS UM GANHADOR!' : 'ÚLTIMO PRÊMIO SORTEADO!'}</h3>
+      <div class="prize-tag" style="--pc:${w.slot.color};--pci:${ink(w.slot.color)}">${w.slot.pos}º prêmio · ${esc(w.slot.name)}</div>
+      <div class="winner">${esc(w.name)}</div>
+      <div class="card-actions">
+        <button class="cbtn" data-act="absent" data-key="${esc(w.slot.key)}" title="A pessoa não está presente: sortear este prêmio novamente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Ausente · sortear de novo</button>
+        ${nextBtn}
+      </div>`;
+  } else {
+    const ordered = [...wins].sort((a, b) => a.slot.pos - b.slot.pos);
+    card.innerHTML = `<div class="rays"></div>
+      <div class="trophy">🎉</div>
+      <h3>TEMOS ${wins.length} GANHADORES!</h3>
+      <ul class="win-list">${ordered.map((w, i) => `
+        <li style="animation-delay:${0.25 + i * 0.22}s;--c:${w.slot.color};--ci:${ink(w.slot.color)}">
+          <span class="slot-n">${w.slot.pos}º</span>
+          <div><div class="w">${esc(w.name)}</div><div class="p">${esc(w.slot.name)}</div></div>
+        </li>`).join('')}</ul>
+      ${remaining ? `<p class="note">Ainda restam ${remaining} prêmio(s) — faltaram participantes na roleta.</p>` : ''}
+      <div class="card-actions">${remaining ? nextBtn : '<button class="cbtn main" data-act="close">Fechar</button>'}</div>
+      <p class="note" style="margin:14px 0 0">Alguém ausente? Use o botão ↻ ao lado do nome na lista de prêmios.</p>`;
+    ordered.forEach((w, i) => setTimeout(() => Sound.pop(i), 250 + i * 220));
+  }
+  modalOpen = true;
+  $('#modal').classList.add('show');
+  setTimeout(() => card.querySelector('.cbtn.main')?.focus(), 50);
+}
+function closeModal() {
+  if (!modalOpen) return;
+  modalOpen = false;
+  $('#modal').classList.remove('show');
+  S.highlight = [];
+  buildWheel();
+  renderResults();
+}
+$('#modal').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (e.target.id === 'modal') return closeModal();
+  if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'close') closeModal();
+  else if (act === 'next') { closeModal(); setTimeout(spin, 350); }
+  else if (act === 'absent') redoSlot(b.dataset.key, true);
+});
+
+/* ================= confetti ================= */
+const Confetti = (() => {
+  const c = $('#confetti'), g = c.getContext('2d');
+  let parts = [], running = false;
+  function size() { const d = Math.min(2, devicePixelRatio || 1); c.width = innerWidth * d; c.height = innerHeight * d; g.setTransform(d, 0, 0, d, 0, 0); }
+  addEventListener('resize', size); size();
+  function burst(n) {
+    const cols = [...cfg.theme.palette, cfg.theme.accent, '#ffffff'];
+    const w = innerWidth, h = innerHeight;
+    for (let i = 0; i < n; i++) {
+      const fromSide = i % 2 ? 1 : -1, side = i < n * 0.6;
+      parts.push({
+        x: side ? (fromSide < 0 ? -10 : w + 10) : Math.random() * w,
+        y: side ? h * (0.55 + Math.random() * 0.3) : -20 - Math.random() * h * 0.4,
+        vx: side ? -fromSide * (6 + Math.random() * 10) : (Math.random() - 0.5) * 3,
+        vy: side ? -(10 + Math.random() * 12) : 2 + Math.random() * 3,
+        r: 4 + Math.random() * 6, rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 0.4,
+        color: cols[Math.floor(Math.random() * cols.length)], shape: Math.random() < 0.65 ? 0 : Math.random() < 0.5 ? 1 : 2,
+        life: 0, tilt: Math.random() * TAU,
+      });
+    }
+    if (!running) { running = true; requestAnimationFrame(loop); }
+  }
+  function loop() {
+    g.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.y < innerHeight + 40 && p.life < 600);
+    for (const p of parts) {
+      p.life++; p.vy += 0.28; p.vx *= 0.985; p.vy = Math.min(p.vy, 6 + p.r * 0.3);
+      p.x += p.vx + Math.sin(p.life / 12 + p.tilt) * 0.6; p.y += p.vy; p.rot += p.vr;
+      g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+      if (p.shape === 0) { g.scale(1, Math.abs(Math.cos(p.life / 8 + p.tilt))); g.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r); }
+      else if (p.shape === 1) { g.beginPath(); g.arc(0, 0, p.r * 0.6, 0, TAU); g.fill(); }
+      else { g.beginPath(); for (let i = 0; i < 5; i++) { const a = i * TAU / 5 - Math.PI / 2; g.lineTo(Math.cos(a) * p.r, Math.sin(a) * p.r); g.lineTo(Math.cos(a + TAU / 10) * p.r * 0.45, Math.sin(a + TAU / 10) * p.r * 0.45); } g.fill(); }
+      g.restore();
+    }
+    if (parts.length) requestAnimationFrame(loop); else { running = false; g.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+  return { burst };
+})();
+
+/* ================= storage for big files (music) ================= */
+const idb = {
+  _db: null,
+  open() {
+    return new Promise((res, rej) => {
+      if (this._db) return res(this._db);
+      if (!window.indexedDB) return rej(new Error('no idb'));
+      const r = indexedDB.open('sorteador-roleta', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('files');
+      r.onsuccess = () => { this._db = r.result; res(this._db); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async run(mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => { const tx = db.transaction('files', mode); const rq = fn(tx.objectStore('files')); tx.oncomplete = () => res(rq && rq.result); tx.onerror = () => rej(tx.error); });
+  },
+  get(k) { return this.run('readonly', s => s.get(k)); },
+  set(k, v) { return this.run('readwrite', s => s.put(v, k)); },
+  del(k) { return this.run('readwrite', s => s.delete(k)); },
+};
+
+/* ================= sound ================= */
+const Sound = (() => {
+  let ac = null, master, musicBus, sfxBus, noiseBuf, timer = null, step = 0, nextTime = 0, playing = false, ducked = false;
+  let fileAudio = null, fileUrl = null;
+  const STEP = 60 / 124 / 4;
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  // C – G – Am – F
+  const CH = [
+    { bass: 36, notes: [60, 64, 67] }, { bass: 43, notes: [59, 62, 67] },
+    { bass: 45, notes: [60, 64, 69] }, { bass: 41, notes: [60, 65, 69] },
+  ];
+  const _ = null;
+  const MEL = [
+    [72, _, 76, _, 79, _, 76, _, 77, 76, 74, _, 72, _, _, _],
+    [74, _, 79, _, 83, _, 79, _, 81, 79, 77, _, 74, _, 71, _],
+    [72, _, 76, _, 81, _, 76, _, 79, 77, 76, _, 74, _, 72, _],
+    [69, _, 72, _, 77, _, 76, 74, 72, _, 74, _, 76, _, 79, _],
+  ];
+  const BASS = new Set([0, 3, 6, 8, 11, 14]);
+
+  function ensure() {
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ac = new AC();
+      master = ac.createGain(); master.connect(ac.destination);
+      musicBus = ac.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
+      sfxBus = ac.createGain(); sfxBus.connect(master);
+      noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      setVolume(cfg.sound.volume);
+    }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tone(f, t, d, type, v, dest, cut) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    let n = o;
+    if (cut) { const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = cut; o.connect(fl); n = fl; }
+    n.connect(g); g.connect(dest); o.start(t); o.stop(t + d + 0.05);
+  }
+  function noise(t, d, v, dest, type, freq, q = 1) {
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noiseBuf; f.type = type; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f); f.connect(g); g.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + d + 0.05);
+    return g;
+  }
+  function kick(t) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+    g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.3);
+  }
+  function playStep(i, t) {
+    const bar = Math.floor(i / 16) % 4, st = i % 16, ch = CH[bar];
+    if (st % 4 === 0) kick(t);
+    if (st === 4 || st === 12) noise(t, 0.14, 0.22, musicBus, 'bandpass', 1900, 0.8);
+    if (st % 2 === 0) noise(t, 0.035, st % 4 === 2 ? 0.07 : 0.03, musicBus, 'highpass', 8000);
+    if (BASS.has(st)) tone(mtof(ch.bass + (st === 8 ? 12 : 0)), t, STEP * 1.5, 'sawtooth', 0.13, musicBus, 600);
+    if (st === 2 || st === 6 || st === 10 || st === 14) ch.notes.forEach(n => tone(mtof(n), t, STEP * 0.9, 'square', 0.022, musicBus, 2400));
+    const m = MEL[bar][st];
+    if (m && Math.floor(i / 64) % 2 === 0) { tone(mtof(m), t, STEP * 1.8, 'square', 0.045, musicBus, 3200); tone(mtof(m + 12), t, STEP * 1.2, 'triangle', 0.02, musicBus); }
+    if (m && Math.floor(i / 64) % 2 === 1 && st % 4 === 0) tone(mtof(m + 12), t, STEP * 2.5, 'triangle', 0.04, musicBus);
+  }
+  function scheduler() {
+    while (nextTime < ac.currentTime + 0.12) { playStep(step, nextTime); nextTime += STEP; step = (step + 1) % 128; }
+  }
+  function setVolume(v) {
+    if (master) master.gain.setTargetAtTime(v, ac.currentTime, 0.05);
+    if (fileAudio) fileAudio.volume = clamp(v * (ducked ? 0.35 : 1), 0, 1);
+  }
+  async function loadFile() {
+    try {
+      const blob = await idb.get('music');
+      if (!blob) return null;
+      if (fileUrl) URL.revokeObjectURL(fileUrl);
+      fileUrl = URL.createObjectURL(blob);
+      if (!fileAudio) { fileAudio = new Audio(); fileAudio.loop = true; }
+      fileAudio.src = fileUrl;
+      fileAudio.volume = cfg.sound.volume;
+      return fileAudio;
+    } catch (e) { return null; }
+  }
+  async function startMusic() {
+    stopMusic();
+    playing = true;
+    if (cfg.sound.source === 'file') {
+      const a = fileAudio && fileAudio.src ? fileAudio : await loadFile();
+      if (a) { try { await a.play(); return true; } catch (e) { playing = false; return false; } }
+    }
+    if (!ensure()) return false;
+    if (ac.state !== 'running') { try { await ac.resume(); } catch (e) {} }
+    if (ac.state !== 'running') { playing = false; return false; }
+    step = 0; nextTime = ac.currentTime + 0.06;
+    timer = setInterval(scheduler, 25);
+    return true;
+  }
+  function stopMusic() {
+    playing = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    if (fileAudio) fileAudio.pause();
+  }
+  return {
+    unlock() { ensure(); if (cfg.sound.music && !playing) startMusic().then(ok => { if (!ok) cfg.sound.music && updateSoundBtns(); }); },
+    startMusic, stopMusic, setVolume, loadFile,
+    get playing() { return playing; },
+    duck(on) {
+      ducked = on;
+      if (musicBus) musicBus.gain.setTargetAtTime(on ? 0.22 : 0.55, ac.currentTime, 0.3);
+      if (fileAudio) fileAudio.volume = clamp(cfg.sound.volume * (on ? 0.35 : 1), 0, 1);
+    },
+    tick() {
+      if (!cfg.sound.sfx || !ensure()) return;
+      const now = performance.now(); if (now - this._lt < 28) return; this._lt = now;
+      const t = ac.currentTime;
+      tone(1700 + Math.random() * 300, t, 0.03, 'square', 0.07, sfxBus, 4000);
+      noise(t, 0.02, 0.08, sfxBus, 'highpass', 3000);
+    },
+    _lt: 0,
+    whoosh() {
+      if (!cfg.sound.sfx || !ensure()) return;
+      const t = ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      s.buffer = noiseBuf; f.type = 'bandpass'; f.Q.value = 1.2;
+      f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2400, t + 0.5);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      s.connect(f); f.connect(g); g.connect(sfxBus); s.start(t); s.stop(t + 0.8);
+    },
+    fanfare() {
+      if (!cfg.sound.sfx || !ensure()) return;
+      const t = ac.currentTime + 0.02;
+      [72, 76, 79, 84].forEach((n, i) => { tone(mtof(n), t + i * 0.11, 0.22, 'sawtooth', 0.09, sfxBus, 2800); tone(mtof(n), t + i * 0.11, 0.25, 'triangle', 0.06, sfxBus); });
+      [72, 76, 79, 84, 88].forEach(n => { tone(mtof(n), t + 0.5, 1.5, 'sawtooth', 0.045, sfxBus, 2600); tone(mtof(n - 12), t + 0.5, 1.5, 'triangle', 0.05, sfxBus); });
+      for (let i = 0; i < 14; i++) tone(mtof(84 + [0, 4, 7, 12][i % 4] + 12), t + 0.6 + i * 0.07, 0.18, 'triangle', 0.025, sfxBus);
+      // crowd / applause
+      const g = noise(t + 0.45, 2.6, 0.0001, sfxBus, 'bandpass', 1400, 0.6);
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(0.0001, t + 0.45); g.gain.exponentialRampToValueAtTime(0.16, t + 0.9); g.gain.exponentialRampToValueAtTime(0.0001, t + 3);
+      for (let i = 0; i < 40; i++) noise(t + 0.5 + Math.random() * 2.2, 0.03, 0.05 + Math.random() * 0.06, sfxBus, 'bandpass', 1800 + Math.random() * 1500, 1.5);
+    },
+    pop(i) {
+      if (!cfg.sound.sfx || !ensure()) return;
+      const t = ac.currentTime;
+      tone(mtof(76 + (i % 5) * 2), t, 0.14, 'triangle', 0.08, sfxBus);
+    },
+  };
+})();
+
+const ICON_MUSIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
+const ICON_MUSIC_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/><path d="M3 3l18 18"/></svg>';
+const ICON_SFX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+const ICON_SFX_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>';
+function updateSoundBtns() {
+  const on = cfg.sound.music && Sound.playing;
+  $('#btnMusic').innerHTML = on ? ICON_MUSIC : ICON_MUSIC_OFF;
+  $('#btnMusic').classList.toggle('off', !on);
+  $('#btnSfx').innerHTML = cfg.sound.sfx ? ICON_SFX : ICON_SFX_OFF;
+  $('#btnSfx').classList.toggle('off', !cfg.sound.sfx);
+  $('#inMusic').checked = cfg.sound.music;
+  $('#inSfx').checked = cfg.sound.sfx;
+}
+async function setMusic(on) {
+  cfg.sound.music = on; save();
+  if (on) {
+    const ok = await Sound.startMusic();
+    if (!ok) toast(cfg.sound.source === 'file' ? 'Envie um arquivo de música em Personalizar → Som.' : 'Clique na página para liberar o som.');
+  } else Sound.stopMusic();
+  updateSoundBtns();
+}
+
+/* ================= drawer / forms ================= */
+function openDrawer(tab) {
+  if (tab) selectTab(tab);
+  $('#drawer').classList.add('show'); $('#scrim').classList.add('show');
+  $('#drawer').setAttribute('aria-hidden', 'false');
+}
+function closeDrawer() {
+  $('#drawer').classList.remove('show'); $('#scrim').classList.remove('show');
+  $('#drawer').setAttribute('aria-hidden', 'true');
+}
+function selectTab(name) {
+  $$('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  $$('.tab').forEach(p => p.classList.toggle('show', p.dataset.panel === name));
+}
+$$('.tabs button').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+$('#btnSettings').addEventListener('click', () => openDrawer());
+$('#btnClose').addEventListener('click', closeDrawer);
+$('#scrim').addEventListener('click', closeDrawer);
+document.addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openDrawer(b.dataset.open); });
+
+const refresh = debounce(() => { buildWheel(); renderResults(); }, 220);
+
+// --- prizes
+const ICON_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>';
+const ICON_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+const ICON_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+function renderPrizeEditor() {
+  $('#prizeEditor').innerHTML = cfg.prizes.map((p, i) => `
+    <div class="prize-row" data-id="${p.id}">
+      <input class="inp p-qty" type="number" min="1" max="500" value="${esc(p.qty)}" aria-label="Quantidade" title="Quantidade">
+      <input class="inp p-name" type="text" value="${esc(p.name)}" placeholder="Descrição do prêmio" aria-label="Descrição">
+      <input class="p-color" type="color" value="${esc(p.color)}" aria-label="Cor do prêmio" title="Cor do ponteiro">
+      <button class="mini p-del" title="Remover prêmio" aria-label="Remover">${ICON_DEL}</button>
+      <input class="inp p-label" type="text" value="${esc(p.label)}" maxlength="18" placeholder="Texto no ponteiro (auto: ${esc(shortLabel({ ...p, label: '' }))})" aria-label="Texto no ponteiro">
+      <div class="mv"><button class="mini p-up" ${i === 0 ? 'disabled' : ''} title="Subir">${ICON_UP}</button><button class="mini p-down" ${i === cfg.prizes.length - 1 ? 'disabled' : ''} title="Descer">${ICON_DOWN}</button></div>
+    </div>`).join('') || '<p class="help">Nenhum prêmio. Adicione abaixo.</p>';
+  updatePrizeCount();
+}
+function updatePrizeCount() {
+  const n = getSlots().length;
+  $('#prizeCount').innerHTML = `<b>${n}</b> ${n === 1 ? 'prêmio' : 'prêmios'} no total`;
+}
+$('#prizeEditor').addEventListener('input', e => {
+  const row = e.target.closest('.prize-row'); if (!row) return;
+  const p = cfg.prizes.find(x => x.id === row.dataset.id); if (!p) return;
+  if (e.target.classList.contains('p-qty')) p.qty = clamp(parseInt(e.target.value, 10) || 0, 0, 500);
+  if (e.target.classList.contains('p-name')) { p.name = e.target.value; row.querySelector('.p-label').placeholder = `Texto no ponteiro (auto: ${shortLabel({ ...p, label: '' })})`; }
+  if (e.target.classList.contains('p-label')) p.label = e.target.value;
+  if (e.target.classList.contains('p-color')) p.color = e.target.value;
+  save(); updatePrizeCount(); refresh();
+});
+$('#prizeEditor').addEventListener('click', e => {
+  const row = e.target.closest('.prize-row'); if (!row) return;
+  const i = cfg.prizes.findIndex(x => x.id === row.dataset.id);
+  if (e.target.closest('.p-del')) cfg.prizes.splice(i, 1);
+  else if (e.target.closest('.p-up') && i > 0) [cfg.prizes[i - 1], cfg.prizes[i]] = [cfg.prizes[i], cfg.prizes[i - 1]];
+  else if (e.target.closest('.p-down') && i < cfg.prizes.length - 1) [cfg.prizes[i + 1], cfg.prizes[i]] = [cfg.prizes[i], cfg.prizes[i + 1]];
+  else return;
+  save(); renderPrizeEditor(); refresh();
+});
+$('#btnAddPrize').addEventListener('click', () => {
+  const pal = [cfg.theme.accent, ...cfg.theme.palette];
+  cfg.prizes.push({ id: uid(), qty: 1, name: '', label: '', color: pal[cfg.prizes.length % pal.length] });
+  save(); renderPrizeEditor(); refresh();
+  const rows = $$('.prize-row'); rows[rows.length - 1]?.querySelector('.p-name').focus();
+});
+function parsePrizeText(text) {
+  const pal = [cfg.theme.accent, ...cfg.theme.palette];
+  return String(text).split(/\r?\n/).map(l => l.trim()).filter(Boolean).map((l, i) => {
+    const m = l.match(/^(\d+)\s*(?:x|×|\*|-)\s*(.+)$/i);
+    let qty = 1, name = l;
+    if (m) { qty = parseInt(m[1], 10); name = m[2].trim(); }
+    if (/^\d[\d.]*(,\d{2})?$/.test(name)) name = 'R$ ' + name;
+    name = name.replace(/^cupons?\b/i, 'Cupom');
+    return { id: uid(), qty: clamp(qty, 1, 500), name, label: '', color: pal[i % pal.length] };
+  });
+}
+$('#btnPrizePaste').addEventListener('click', () => {
+  const list = parsePrizeText($('#prizePaste').value);
+  if (!list.length) return toast('Cole ao menos uma linha.');
+  if (Object.keys(cfg.results).length && !confirm('Substituir os prêmios vai limpar os ganhadores já sorteados. Continuar?')) return;
+  cfg.prizes = list; cfg.results = {}; save(); renderPrizeEditor(); refresh();
+  toast(`${getSlots().length} prêmios aplicados.`);
+});
+
+// --- names
+function updateNameCount() {
+  const names = parseNames(cfg.namesText);
+  const uniq = new Set(names.map(norm)).size;
+  $('#nameCount').innerHTML = `<b>${names.length}</b> ${names.length === 1 ? 'nome' : 'nomes'}`;
+  $('#dupWarn').textContent = names.length - uniq > 0 ? `⚠️ ${names.length - uniq} nome(s) repetido(s). Repetidos aumentam a chance da pessoa — use "Remover repetidos" se não for intencional.` : '';
+}
+$('#namesInput').addEventListener('input', e => { cfg.namesText = e.target.value; save(); updateNameCount(); refresh(); });
+function setNames(list) { cfg.namesText = list.join('\n'); $('#namesInput').value = cfg.namesText; save(); updateNameCount(); refresh(); }
+$('#btnShuffle').addEventListener('click', () => {
+  const a = parseNames(cfg.namesText);
+  for (let i = a.length - 1; i > 0; i--) { const j = randInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  setNames(a); toast('Ordem embaralhada 🔀');
+});
+$('#btnDedupe').addEventListener('click', () => {
+  const seen = new Set(), a = parseNames(cfg.namesText).filter(n => { const k = norm(n); if (seen.has(k)) return false; seen.add(k); return true; });
+  setNames(a); toast('Repetidos removidos.');
+});
+$('#btnClearNames').addEventListener('click', () => { if (confirm('Apagar todos os nomes?')) setNames([]); });
+$('#namesFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const txt = await f.text();
+  const rows = txt.split(/\r?\n/).map(l => l.split(/[;,\t]/)[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
+  setNames(rows); e.target.value = ''; toast(`${rows.length} nomes importados.`);
+});
+
+// --- appearance
+function renderPresets() {
+  $('#presets').innerHTML = Object.entries(PRESETS).map(([k, p]) => `
+    <button class="preset" data-preset="${k}" aria-pressed="${cfg.preset === k}">
+      <div class="sw" style="background:linear-gradient(135deg,${p.bg1},${p.bg2})">${[p.accent, ...p.palette.slice(0, 4)].map(c => `<i style="background:${c}"></i>`).join('')}</div>
+      <span>${p.name}</span>
+    </button>`).join('');
+}
+function renderPaletteEditor() {
+  $('#paletteEditor').innerHTML = cfg.theme.palette.map((c, i) => `<input type="color" value="${c}" data-pi="${i}" aria-label="Cor ${i + 1}">`).join('') +
+    `<button class="mini" id="palAdd" title="Adicionar cor" style="width:40px;height:36px">+</button>` +
+    (cfg.theme.palette.length > 2 ? `<button class="mini" id="palDel" title="Remover última cor" style="width:40px;height:36px">−</button>` : '');
+}
+function fillThemeInputs() {
+  $('#cBg1').value = cfg.theme.bg1; $('#cBg2').value = cfg.theme.bg2;
+  $('#cAccent').value = cfg.theme.accent; $('#cText').value = cfg.theme.text;
+  renderPaletteEditor();
+  $$('.preset').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === cfg.preset)));
+}
+function themeChanged() { cfg.preset = 'custom'; save(); applyTheme(); renderWheelImage(); renderResults(); $$('.preset').forEach(b => b.setAttribute('aria-pressed', 'false')); }
+$('#presets').addEventListener('click', e => {
+  const b = e.target.closest('.preset'); if (!b) return;
+  const p = PRESETS[b.dataset.preset];
+  cfg.preset = b.dataset.preset;
+  cfg.theme = { bg1: p.bg1, bg2: p.bg2, accent: p.accent, text: p.text, palette: [...p.palette] };
+  save(); applyTheme(); fillThemeInputs(); renderWheelImage(); renderResults();
+});
+[['#cBg1', 'bg1'], ['#cBg2', 'bg2'], ['#cAccent', 'accent'], ['#cText', 'text']].forEach(([sel, key]) =>
+  $(sel).addEventListener('input', e => { cfg.theme[key] = e.target.value; themeChanged(); }));
+$('#paletteEditor').addEventListener('input', e => { const i = e.target.dataset.pi; if (i == null) return; cfg.theme.palette[+i] = e.target.value; themeChanged(); });
+$('#paletteEditor').addEventListener('click', e => {
+  if (e.target.id === 'palAdd') cfg.theme.palette.push(cfg.theme.palette[cfg.theme.palette.length % 3] || '#ffffff');
+  else if (e.target.id === 'palDel') cfg.theme.palette.pop();
+  else return;
+  renderPaletteEditor(); themeChanged();
+});
+$('#inTitle').addEventListener('input', e => { cfg.title = e.target.value; save(); renderHeader(); });
+$('#inSubtitle').addEventListener('input', e => { cfg.subtitle = e.target.value; save(); renderHeader(); });
+$('#inHubLogo').addEventListener('change', e => { cfg.hubLogo = e.target.checked; save(); });
+$('#inConfetti').addEventListener('change', e => { cfg.confetti = e.target.checked; save(); if (cfg.confetti) Confetti.burst(80); });
+$('#logoFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      // Shrink large logos so they fit comfortably in localStorage.
+      const max = 512, sc = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      cfg.logo = f.type === 'image/svg+xml' && rd.result.length < 200000 ? rd.result : c.toDataURL('image/png');
+      save(); renderHeader(); toast('Logo atualizada ✨');
+    };
+    im.onerror = () => toast('Não foi possível ler esta imagem.');
+    im.src = rd.result;
+  };
+  rd.readAsDataURL(f); e.target.value = '';
+});
+$('#btnLogoRemove').addEventListener('click', () => { cfg.logo = ''; save(); renderHeader(); });
+
+// --- draw settings
+function fillDrawInputs() {
+  $$('.mode').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === cfg.mode)));
+  $('#inReverse').checked = cfg.reverseOrder;
+  $('#inRemove').checked = cfg.removeWinners;
+  $('#inDuration').value = cfg.spinSeconds; $('#durVal').textContent = cfg.spinSeconds + 's';
+}
+$$('.mode').forEach(b => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; save(); fillDrawInputs(); refresh(); }));
+$('#inReverse').addEventListener('change', e => { cfg.reverseOrder = e.target.checked; save(); refresh(); });
+$('#inRemove').addEventListener('change', e => { cfg.removeWinners = e.target.checked; save(); refresh(); });
+$('#inDuration').addEventListener('input', e => { cfg.spinSeconds = +e.target.value; $('#durVal').textContent = cfg.spinSeconds + 's'; save(); });
+$('#btnExport').addEventListener('click', () => {
+  const slug = (cfg.title || 'sorteio').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  download(`roleta-${slug || 'config'}.json`, JSON.stringify({ ...cfg, results: {}, absent: [] }, null, 2), 'application/json');
+});
+$('#importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || typeof data !== 'object' || !Array.isArray(data.prizes)) throw new Error('formato');
+    cfg = merge(defaults(), data); save(); renderAll(); toast('Configuração importada ✅');
+  } catch (err) { toast('Arquivo inválido.'); }
+  e.target.value = '';
+});
+$('#btnFactory').addEventListener('click', () => {
+  if (!confirm('Restaurar tudo para o padrão? Prêmios, nomes, tema, logo e resultados serão apagados.')) return;
+  Sound.stopMusic(); cfg = defaults(); save(); renderAll(); toast('Configuração restaurada.');
+});
+
+// --- sound
+function fillSoundInputs() {
+  $('#inVolume').value = cfg.sound.volume; $('#volVal').textContent = Math.round(cfg.sound.volume * 100) + '%';
+  $('#inSource').value = cfg.sound.source;
+  $('#fileField').style.display = cfg.sound.source === 'file' ? '' : 'none';
+  $('#musicName').textContent = cfg.sound.fileName ? '🎵 ' + cfg.sound.fileName : 'Nenhum arquivo enviado.';
+  updateSoundBtns();
+}
+$('#inMusic').addEventListener('change', e => setMusic(e.target.checked));
+$('#inSfx').addEventListener('change', e => { cfg.sound.sfx = e.target.checked; save(); updateSoundBtns(); });
+$('#btnMusic').addEventListener('click', () => setMusic(!(cfg.sound.music && Sound.playing)));
+$('#btnSfx').addEventListener('click', () => { cfg.sound.sfx = !cfg.sound.sfx; save(); updateSoundBtns(); if (cfg.sound.sfx) Sound.pop(2); });
+$('#inVolume').addEventListener('input', e => { cfg.sound.volume = +e.target.value; $('#volVal').textContent = Math.round(cfg.sound.volume * 100) + '%'; Sound.setVolume(cfg.sound.volume); save(); });
+$('#inSource').addEventListener('change', e => { cfg.sound.source = e.target.value; save(); fillSoundInputs(); if (cfg.sound.music) setMusic(true); });
+$('#musicFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    await idb.set('music', f);
+    cfg.sound.fileName = f.name; cfg.sound.source = 'file'; save();
+    await Sound.loadFile(); fillSoundInputs(); setMusic(true);
+    toast('Música salva 🎶');
+  } catch (err) { toast('Não foi possível salvar a música neste navegador.'); }
+  e.target.value = '';
+});
+$('#btnMusicRemove').addEventListener('click', async () => {
+  try { await idb.del('music'); } catch (e) {}
+  Sound.stopMusic(); cfg.sound.fileName = ''; cfg.sound.source = 'synth'; save(); fillSoundInputs();
+  if (cfg.sound.music) setMusic(true);
+});
+
+/* ================= main actions ================= */
+$('#btnSpin').addEventListener('click', spin);
+canvas.addEventListener('click', e => {
+  const r = canvas.getBoundingClientRect();
+  const x = (e.clientX - r.left) * L.dpr - L.c, y = (e.clientY - r.top) * L.dpr - L.c;
+  if (Math.hypot(x, y) < L.Rw * 0.2) spin();
+});
+$('#slotList').addEventListener('click', e => {
+  const b = e.target.closest('[data-redo]'); if (!b || S.spinning) return;
+  const r = cfg.results[b.dataset.redo];
+  if (r && confirm(`Marcar "${r.winner}" como ausente e sortear este prêmio novamente?`)) redoSlot(b.dataset.redo, false);
+});
+$('#btnCopy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(resultText()); toast('Resultado copiado 📋'); }
+  catch (e) { prompt('Copie o resultado:', resultText()); }
+});
+$('#btnCsv').addEventListener('click', () => {
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const rows = [['Posição', 'Prêmio', 'Ganhador', 'Data/hora'].map(q).join(';')];
+  getSlots().forEach(s => { const r = cfg.results[s.key]; rows.push([s.pos + 'º', s.name, r ? r.winner : '', r ? new Date(r.at).toLocaleString('pt-BR') : ''].map(q).join(';')); });
+  if (cfg.absent.length) { rows.push(''); rows.push(q('Ausentes (re-sorteados)')); cfg.absent.forEach(a => rows.push(q(a))); }
+  download('resultado-sorteio.csv', '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
+});
+$('#btnReset').addEventListener('click', () => {
+  if (!Object.keys(cfg.results).length && !cfg.absent.length) return toast('Nada para limpar — o sorteio ainda não começou.');
+  if (!confirm('Começar um novo sorteio? Os ganhadores atuais serão apagados (prêmios e nomes continuam).')) return;
+  cfg.results = {}; cfg.absent = []; save(); S.highlight = []; closeModal(); buildWheel(); renderResults(); toast('Pronto para um novo sorteio!');
+});
+$('#btnFull').addEventListener('click', toggleFull);
+function toggleFull() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+  else document.exitFullscreen?.();
+}
+document.addEventListener('fullscreenchange', () => document.body.classList.toggle('present', !!document.fullscreenElement));
+
+document.addEventListener('keydown', e => {
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '') || document.activeElement?.isContentEditable;
+  if (e.key === 'Escape') { if (modalOpen) closeModal(); else closeDrawer(); return; }
+  if (typing || $('#drawer').classList.contains('show')) return;
+  if (e.code === 'Space' || (e.key === 'Enter' && !modalOpen && document.activeElement === document.body)) { e.preventDefault(); spin(); }
+  else if (e.key === 'f' || e.key === 'F') toggleFull();
+  else if (e.key === 'm' || e.key === 'M') $('#btnMusic').click();
+});
+// First interaction unlocks audio (browser autoplay policy) and resumes music if it was on.
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { if (cfg.sound.music && !Sound.playing) Sound.unlock(); setTimeout(updateSoundBtns, 200); }, { once: true }));
+
+/* ================= boot ================= */
+function renderAll() {
+  applyTheme(); renderHeader();
+  $('#inTitle').value = cfg.title; $('#inSubtitle').value = cfg.subtitle;
+  $('#inHubLogo').checked = cfg.hubLogo; $('#inConfetti').checked = cfg.confetti;
+  $('#namesInput').value = cfg.namesText; updateNameCount();
+  renderPresets(); fillThemeInputs(); renderPrizeEditor(); fillDrawInputs(); fillSoundInputs();
+  S.highlight = [];
+  buildWheel(); renderResults();
+}
+function frame(t) {
+  if (S.spinning) stepSpin(t);
+  for (let k = 0; k < S.flaps.length; k++) S.flaps[k] *= 0.86;
+  if (L.size) draw(t);
+  requestAnimationFrame(frame);
+}
+renderAll();
+new ResizeObserver(debounce(() => layout(), 60)).observe($('#wheelWrap'));
+if (document.fonts) document.fonts.ready.then(() => renderWheelImage());
+if (cfg.sound.source === 'file') Sound.loadFile();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
